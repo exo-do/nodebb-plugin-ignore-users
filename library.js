@@ -4,10 +4,7 @@ var plugin = {};
 
 var Socket = module.parent.require('./socket.io/modules'),
 	User = module.parent.require('./user'),
-	db = module.parent.require('./database'),
-	fs = require('fs'),
-	path = require('path'),
-	async = require('async');
+	db = module.parent.require('./database');
 
 
 plugin.init = function (data, callback) {
