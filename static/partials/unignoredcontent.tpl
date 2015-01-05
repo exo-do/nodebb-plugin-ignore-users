@@ -1,0 +1,1 @@
+<div class="original-content hide" itemprop="text">{posts.originalContent}</div>

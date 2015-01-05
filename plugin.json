@@ -6,15 +6,10 @@
 	"library": "./library.js",
 	"hooks": [
 		{
-			"hook": "filter:post.getPosts",
-			"method": "init"
-		},
-		{
-			"hook": "filter:topic.get",
-			"method": "parsePosts"
+			"hook": "filter:parse.post", 
+			"method": "parse"
 		}
 	],
 	"scripts": ["static/lib/main.js"],
-	"templates": "static/templates",
 	"less": ["static/style.less"]
 }
