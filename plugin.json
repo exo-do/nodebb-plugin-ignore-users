@@ -6,10 +6,21 @@
 	"library": "./library.js",
 	"hooks": [
 		{
-			"hook": "filter:parse.post", 
+			"hook": "filter:parse.post",
 			"method": "parse"
+		},
+		{
+			"hook": "static:app.load",
+			"method": "init"
+		},
+
+		{
+			"hook": "filter:templates.get_config",
+			"method": "changeClientRouting"
 		}
 	],
-	"scripts": ["static/lib/main.js"],
-	"less": ["static/style.less"]
+	"scripts": ["static/lib/topic.js", "static/lib/profile.js"],
+	"templates": "static/templates",
+	"less": ["static/style.less"],
+	"languages": "public/language"
 }

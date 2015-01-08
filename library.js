@@ -5,7 +5,11 @@
 
 	var Socket = module.parent.require('./socket.io/modules'),
 		User = module.parent.require('./user'),
-		db = module.parent.require('./database');
+		db = module.parent.require('./database'),
+		async = module.parent.require('async'),
+		helpers = module.parent.require('./controllers/helpers'),
+		nconf = module.parent.require('nconf'),
+		templates = module.parent.require('templates.js');
 
 	/**
 	 * Comprueba si el post pertenece a un usuario ignorado
@@ -32,6 +36,51 @@
 			callback(null, data);
 		}
 	};
+
+	plugin.init = function (params, callback) {
+		var app = params.router,
+			controllers = params.controllers;
+		
+		controllers.accounts.getIgnored = function (req, res, next) {
+			if (!req.user) {
+				return helpers.notAllowed(req, res);
+			}
+						
+			async.waterfall([
+				function(next) {
+					User.getUidByUserslug(req.params.userslug, next);
+				},
+				function(uid, next) {
+					if (req.user.uid !== uid) {
+						return helpers.notAllowed(req, res);
+					}
+					User.getIgnoredUsers(req.user.uid, next);
+				}, User.getUsersData
+			], function(err, users) {
+				if (err) {
+					console.err(err);
+					return helpers.notFound(req, res);
+				}
+				res.render('account/ignored', {
+					userslug: req.params.userslug,
+					ignored: users
+				});
+			});
+			
+		}
+
+		app.get('/user/:userslug/ignored', params.middleware.buildHeader, controllers.accounts.getIgnored);
+		app.get('/api/user/:userslug/ignored', controllers.accounts.getIgnored);
+		
+		templates.setGlobal('ignorePluginEnabled', true);
+
+		callback();
+	};
+	
+	plugin.changeClientRouting = function (config, callback) {
+		config.custom_mapping['^user/.*/ignored'] = 'account/ignored';
+		callback(null, config);
+	}
 
 	/**
 	 * Comprueba si un usuario (uid) tiene a otro usuario (otheruid) ignorado

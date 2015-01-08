@@ -15,7 +15,15 @@
 		border: none !important;
 	}
 	
-	.profile-image-block > a, .profile-image-block > span {
-		display: none;
+	.post-signature, .profile-image-block > a, .profile-image-block > span {
+		display: none !important;
 	}
+	
+	a.unignore {
+		display: block !important;
+	}
+}
+
+.post-row:not(.ignored) a.ignore {
+	display: block !important;
 }

@@ -1,11 +1,15 @@
 (function () {
 	"use strict";
+	
+	$(document).ready(function () {
+		templates.setGlobal('ignorePluginEnabled', true);
+	});
 
 	$(window).on('action:topic.loaded', function (event, data) {
-		init();
+		addTopicHandlers();
 	});
 	
-	function init() {
+	function addTopicHandlers() {
 		$('.posts').on('click', 'a.ignore, a.unignore', function () {
 
 			//Ejecutamos la accion de des/ignorar
@@ -27,9 +31,8 @@
 	 * Ignora o des-ignora al usuario seleccionado
 	 */
 	function toggleIgnoreUser(user) {
-		socket.emit(user.ignored ? 'modules.unignoreUser' : 'modules.ignoreUser', {
-			ignoreduid: user.id
-		}, function (err, res) {
+		socket.emit(user.ignored ? 'modules.unignoreUser' : 'modules.ignoreUser', {ignoreduid: user.id}, function (err, res) {
+			
 			if (err) {
 				return;
 			}
@@ -91,5 +94,6 @@
 			}
 		});
 	}
-
+	
+	
 }());
