@@ -1,11 +1,12 @@
 <!-- IMPORT partials/account_menu.tpl -->
 
-<h2>[[ignored:ignoredList]]</h2>
-
 <div class="users account ignored-users">
-	<div>
+	
+	<div class="panel panel-default">
+		<div class="panel-heading"><h3 class="panel-title">[[ignored:ignored_list]]</h3></div>
+		
 		<!-- BEGIN ignored -->
-		<div class="users-box" data-uid="{ignored.uid}" data-username="{ignored.username}">
+		<div class="panel-body users-box" data-uid="{ignored.uid}" data-username="{ignored.username}">
 			<a href="{relative_path}/user/{ignored.userslug}"><img src="{ignored.picture}" class="img-thumbnail"/></a>
 			<div class="user-info">
 				<a href="{relative_path}/user/{ignored.userslug}">{ignored.username}</a>
@@ -23,7 +24,7 @@
 
 		<!-- END ignored -->
 	</div>
-	<div id="no-ignored-notice" class="alert alert-warning hide">[[user:follows_no_one]]</div>
+	<div id="no-ignored-notice" class="alert alert-success <!-- IF ignoredCount -->hide<!-- ENDIF ignoredCount -->">[[ignored:ignored_no_one]]</div>
 </div>
 
 <input type="hidden" template-variable="yourid" value="{yourid}" />

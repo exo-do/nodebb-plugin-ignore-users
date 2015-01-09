@@ -16,10 +16,11 @@
 	 */
 	plugin.parse = function (data, callback) {
 		try {
-			if (data.uid) {
+			if (data.uid && data.uid !== data.postData.uid) {
 				User.isIgnored(data.uid, data.postData.uid, function (err, ignored) {
 					if (err) {
-						return callback(err);
+						console.error("Error al comprobar si un usuario esta ignorado " + data.postData.uid, e);
+						return callback(null, data);
 					}
 
 					data.postData.originalContent = data.postData.content;
@@ -37,49 +38,82 @@
 		}
 	};
 
+	/**
+	 * Define las nuevas rutas /user/:userlug/ignored que mostraran la lista de ignorados del usuario
+	 */
 	plugin.init = function (params, callback) {
 		var app = params.router,
 			controllers = params.controllers;
-		
+
 		controllers.accounts.getIgnored = function (req, res, next) {
 			if (!req.user) {
 				return helpers.notAllowed(req, res);
 			}
-						
+
 			async.waterfall([
-				function(next) {
+
+				function (next) {
 					User.getUidByUserslug(req.params.userslug, next);
 				},
-				function(uid, next) {
+				function (uid, next) {
 					if (req.user.uid !== uid) {
 						return helpers.notAllowed(req, res);
 					}
 					User.getIgnoredUsers(req.user.uid, next);
-				}, User.getUsersData
-			], function(err, users) {
+				},
+				User.getUsersData
+			], function (err, users) {
 				if (err) {
 					console.err(err);
 					return helpers.notFound(req, res);
 				}
+
 				res.render('account/ignored', {
+					showSettings: true,
+					isSelf: true,
 					userslug: req.params.userslug,
-					ignored: users
+					ignored: users,
+					ignoredCount: users.length
 				});
 			});
-			
+
 		}
 
 		app.get('/user/:userslug/ignored', params.middleware.buildHeader, controllers.accounts.getIgnored);
 		app.get('/api/user/:userslug/ignored', controllers.accounts.getIgnored);
-		
+
 		templates.setGlobal('ignorePluginEnabled', true);
 
 		callback();
 	};
-	
+
 	plugin.changeClientRouting = function (config, callback) {
 		config.custom_mapping['^user/.*/ignored'] = 'account/ignored';
 		callback(null, config);
+	}
+
+	/**
+	 * Hook que se llama cuando se muestra el perfil de un usuario. Lo usamos para saber si está ignorado o no.
+	 */
+	plugin.checkIgnoredAccount = function (data, callback) {
+		try {
+			if (data.uid && data.uid !== data.userData.uid) {
+				User.isIgnored(data.uid, data.userData.uid, function (err, ignored) {
+					if (err) {
+						console.error("[PROFILE] Error al comprobar si un usuario esta ignorado " + data.userData.uid, e);
+						return callback(null, data);
+					}
+					
+					data.userData.isIgnored = ignored;
+					callback(null, data);
+				});
+			} else {
+				callback(null, data);
+			}
+		} catch (e) {
+			console.error("[PROFILE] Error al comprobar si un usuario esta ignorado al ver su perfil " + data.userData.uid, e);
+			callback(null, data);
+		}
 	}
 
 	/**

@@ -1,6 +1,6 @@
 (function () {
 	"use strict";
-	
+
 	$(document).ready(function () {
 		templates.setGlobal('ignorePluginEnabled', true);
 	});
@@ -9,6 +9,13 @@
 		addTopicHandlers();
 	});
 	
+	$(window).on('action:ajaxify.contentLoaded', function (event, data) {
+		/* Estamos en el perfil */
+		if ($('.account-username-box').length) {
+			addProfileHandlers();
+		}
+	});
+
 	function addTopicHandlers() {
 		$('.posts').on('click', 'a.ignore, a.unignore', function () {
 
@@ -18,7 +25,7 @@
 				id: post.data('uid'),
 				name: post.data('username'),
 				ignored: post.is('.ignored')
-			});
+			}, toggleIgnorePosts);
 
 			//Cerramos el dropdown
 			_clearMenus();
@@ -27,12 +34,29 @@
 		});
 	}
 
+	function addProfileHandlers() {
+		$('.account').on('click', 'a.ignore, a.unignore', function () {
+
+			//Ejecutamos la accion de des/ignorar
+			var user = $(this).parents('.account');
+			toggleIgnoreUser({
+				id: user.data('uid'),
+				name: user.data('username'),
+				ignored: user.is('.ignored')
+			}, toggleIgnoreProfile);
+
+			return false;
+		});
+	}
+
 	/**
 	 * Ignora o des-ignora al usuario seleccionado
 	 */
-	function toggleIgnoreUser(user) {
-		socket.emit(user.ignored ? 'modules.unignoreUser' : 'modules.ignoreUser', {ignoreduid: user.id}, function (err, res) {
-			
+	function toggleIgnoreUser(user, callback) {
+		socket.emit(user.ignored ? 'modules.unignoreUser' : 'modules.ignoreUser', {
+			ignoreduid: user.id
+		}, function (err, res) {
+
 			if (err) {
 				return;
 			}
@@ -54,7 +78,7 @@
 				});
 			}
 
-			toggleIgnorePosts(user);
+			callback(user);
 		});
 	}
 
@@ -64,7 +88,7 @@
 	function toggleIgnorePosts(user) {
 		$('.post-row[data-uid=' + user.id + ']').each(function (i, post) {
 			post = $(post);
-			
+
 			if (user.ignored) {
 
 				//Nos guardamos el contenido original
@@ -78,9 +102,9 @@
 				//Añadimos el contenido original la lado del ocultado para poder recuperarlo luego
 				post.find('.original-content').html(originalContent);
 
-				//Botones de ignorar-designorar
-				post.find('a.ignore').hide();
-				post.find('a.unignore').show();
+				//				//Botones de ignorar-designorar
+				//				post.find('a.ignore').hide();
+				//				post.find('a.unignore').show();
 			} else {
 				//Mostramos de nuevo el post
 				post.removeClass('ignored');
@@ -88,12 +112,23 @@
 				//Devolvemos el contenido original
 				post.find('.post-content').html(post.find('.original-content').html());
 
-				//Botones de ignorar-designorar
-				post.find('a.ignore').show();
-				post.find('a.unignore').hide();
+				//				//Botones de ignorar-designorar
+				//				post.find('a.ignore').show();
+				//				post.find('a.unignore').hide();
 			}
 		});
 	}
-	
-	
+
+	/**
+	 * Marca como ignorado el perfil de un usuario
+	 */
+	function toggleIgnoreProfile(user) {
+		if (user.ignored) {
+			$('.account').addClass('ignored');
+		} else {
+			$('.account').removeClass('ignored');
+		}
+	}
+
+
 }());

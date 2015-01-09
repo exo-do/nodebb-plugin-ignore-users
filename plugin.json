@@ -13,10 +13,13 @@
 			"hook": "static:app.load",
 			"method": "init"
 		},
-
 		{
 			"hook": "filter:templates.get_config",
 			"method": "changeClientRouting"
+		},
+		{
+			"hook": "filter:user.account",
+			"method": "checkIgnoredAccount"
 		}
 	],
 	"scripts": ["static/lib/topic.js", "static/lib/profile.js"],

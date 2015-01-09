@@ -2,6 +2,8 @@
     "ignore": "Ignorar",
     "unignore": "Dejar de ignorar",
 	"ignored": "Ignorados",
-	"ignoreUser": "Ignorar usuario",
-	"ignoredList": "Lista de ignorados"
+	"ignore_user": "Ignorar usuario",
+	"ignored_list": "Lista de ignorados",
+	"ignored_no_one": "No tienes a nadie en tu lista de ignorados :)",
+	"ignored_post": "Este mensaje está oculto porque <strong>%1</strong> está en tu lista de ignorados."
 }
