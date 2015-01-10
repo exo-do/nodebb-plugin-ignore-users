@@ -67,7 +67,7 @@
 					console.err(err);
 					return helpers.notFound(req, res);
 				}
-
+				
 				res.render('account/ignored', {
 					showSettings: true,
 					isSelf: true,

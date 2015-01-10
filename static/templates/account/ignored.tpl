@@ -6,10 +6,10 @@
 		<div class="panel-heading"><h3 class="panel-title">[[ignored:ignored_list]]</h3></div>
 		
 		<!-- BEGIN ignored -->
-		<div class="panel-body users-box" data-uid="{ignored.uid}" data-username="{ignored.username}">
+		<div class="panel-body users-box" data-uid="{ignored.uid}">
 			<a href="{relative_path}/user/{ignored.userslug}"><img src="{ignored.picture}" class="img-thumbnail"/></a>
 			<div class="user-info">
-				<a href="{relative_path}/user/{ignored.userslug}">{ignored.username}</a>
+				<a class='username' href="{relative_path}/user/{ignored.userslug}">{ignored.username}</a>
 				<div title="reputation" class="reputation">
 					<span class='formatted-number'>{ignored.reputation}</span>
 					<i class='fa fa-star'></i>

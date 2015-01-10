@@ -5,7 +5,7 @@
 		/* Si estamos en la vista de usuarios ignorados */
 		$('.users.account.ignored-users').on('click', 'button.unignore', function () {
 			var userbox = $(this).parents('.users-box');
-			unignoreUser({id: userbox.data('uid'), name: userbox.data('username')}, function () {
+			unignoreUser({id: userbox.data('uid'), name: userbox.find('.username').text()}, function () {
 				userbox.fadeOut();
 			});
 		});
