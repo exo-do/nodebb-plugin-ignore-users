@@ -70,6 +70,7 @@
 				
 				res.render('account/ignored', {
 					showSettings: true,
+					showHidden: true,
 					isSelf: true,
 					userslug: req.params.userslug,
 					ignored: users,
