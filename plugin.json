@@ -20,6 +20,10 @@
 		{
 			"hook": "filter:user.account",
 			"method": "checkIgnoredAccount"
+		},
+		{
+			"hook": "filter:category.topics.get",
+			"method": "filterIgnoredTopics"
 		}
 	],
 	"scripts": ["static/lib/topic.js", "static/lib/profile.js"],

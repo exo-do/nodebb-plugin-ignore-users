@@ -145,5 +145,23 @@
 		db.setRemove('ignored:' + socket.uid, data.ignoreduid, callback);
 	};
 
+	/**
+	 * Marca como ignorados, para luego ocultarlos, los hilos creados por un usuario ignorado
+	 */
+	plugin.filterIgnoredTopics = function (data, callback) {
+		
+		User.getIgnoredUsers(data.uid, function (err, ignoredUsers) {
+			console.log(ignoredUsers)
+			if (ignoredUsers && ignoredUsers.length) {
+				data.topics.forEach(function (topic) {
+					topic.ignored = ignoredUsers.indexOf(topic.uid.toString()) !== -1;
+				});
+			}
+			
+			callback(null, data);
+		})
+		
+	};
+
 	module.exports = plugin;
 }(module));

@@ -37,3 +37,30 @@
 .account:not(.ignored) a.ignore {
 	display: inline-block !important;
 }
+
+.category-item.ignored {
+	opacity: 0.2;
+	
+	* {
+		padding: 0 !important;
+	}
+	
+	.threadlastpost, .threadstats {
+		display: none !important;
+	}
+	
+	.threadinfo {
+		a[href*="user"] {
+			text-decoration: line-through !important;
+		}
+		
+		> h3 {
+			margin-top: 3px !important;
+		}
+		
+		.threadstatus {
+			min-height: 30px !important;
+			visibility: hidden;
+		}
+	}
+}
