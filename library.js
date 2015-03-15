@@ -16,24 +16,29 @@
 	 */
 	plugin.parse = function (data, callback) {
 		try {
-			if (data.uid && data.uid !== data.postData.uid) {
-				User.isIgnored(data.uid, data.postData.uid, function (err, ignored) {
-					if (err) {
-						console.error("Error al comprobar si un usuario esta ignorado " + data.postData.uid, e);
-						return callback(null, data);
-					}
+			async.eachSeries(data.posts,
+			function(p, cb){
+				if (data.uid && data.uid !== p.uid) {
+					User.isIgnored(data.uid, p.uid, function (err, ignored) {
+						if (err) {
+							console.error("Error al comprobar si un usuario esta ignorado " + p.uid, e);
+							cb();
+						}
 
-					data.postData.originalContent = data.postData.content;
-					data.postData.ignored = ignored;
+						p.originalContent = p.content;
+						p.ignored = ignored;
 
-					callback(null, data);
+						cb();
 
-				});
-			} else {
+					});
+				} else {
+					cb();
+				}
+			}, function(r){
 				callback(null, data);
-			}
+			});
 		} catch (e) {
-			console.error("Error al parsear el contenido del post " + data.postData.pid, e);
+			console.error("Error al parsear el contenido del post ", e);
 			callback(null, data);
 		}
 	};

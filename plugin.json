@@ -6,8 +6,7 @@
 	"library": "./library.js",
 	"hooks": [
 		{
-			"hook": "filter:parse.post",
-			"method": "parse"
+			"hook": "filter:post.getPosts", "method": "parse", "callbacked": true
 		},
 		{
 			"hook": "static:app.load",
