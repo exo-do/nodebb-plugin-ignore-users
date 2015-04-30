@@ -18,7 +18,7 @@
 		try {
 			async.eachSeries(data.posts,
 			function(p, cb){
-				if (data.uid && data.uid !== p.uid) {
+				if (data && data.uid && data.uid !== p.uid) {
 					User.isIgnored(data.uid, p.uid, function (err, ignored) {
 						if (err) {
 							console.error("Error al comprobar si un usuario esta ignorado " + p.uid, e);

@@ -6,11 +6,13 @@
 	});
 
 	$(window).on('action:topic.loaded', function (event, data) {
+		console.log(data);
 		addTopicHandlers();
 	});
 	
 	$(window).on('action:ajaxify.contentLoaded', function (event, data) {
 		/* Estamos en el perfil */
+		console.log(data);
 		if ($('.account-username-box').length) {
 			addProfileHandlers();
 		}
