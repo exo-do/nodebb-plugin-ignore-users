@@ -1,9 +1,9 @@
 {
-    "ignore": "Ignorar",
-    "unignore": "Dejar de ignorar",
-	"ignored": "Ignorados",
-	"ignore_user": "Ignorar usuario",
-	"ignored_list": "Lista de ignorados",
-	"ignored_no_one": "No tienes a nadie en tu lista de ignorados :)",
-	"ignored_post": "Este mensaje está oculto porque <strong>%1</strong> está en tu lista de ignorados."
+    "ignore": "Ignore",
+    "unignore": "Unignore",
+	"ignored": "Ignored",
+	"ignore_user": "Ignore user",
+	"ignored_list": "Ignored List",
+	"ignored_no_one": "Your ignore list is empty :)",
+	"ignored_post": "This message is hidden because <strong>%1</strong> is in your ignored list."
 }
