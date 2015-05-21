@@ -1,5 +1,6 @@
 # Ignore Users for NodeBB
 
+![Alt text](/nodeplugins.jpg "Exodo plugins")
 
 Plugin to ignore post from certain users
 
