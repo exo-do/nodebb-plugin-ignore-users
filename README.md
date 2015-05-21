@@ -17,7 +17,7 @@ Add `<!-- IF posts.ignored --> ignored<!-- ENDIF posts.ignored -->` on `class` a
 ```
 	<li class="post-row<!-- IF posts.deleted --> deleted<!-- ENDIF posts.deleted --><!-- IF posts.ignored --> ignored<!-- ENDIF posts.ignored -->"...></li>
 ```
-Add buttons to ignore user **Ignorar usuario** :
+Add buttons to ignore user :
 
 ```
 	<!-- IF !posts.selfPost --> 	 	
