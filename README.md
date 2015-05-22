@@ -33,3 +33,7 @@ Adding content on Dom in case user press unignore:
 ```
 	<div class="original-content hide" itemprop="text">{posts.originalContent}</div> 
 ```
+
+Want to join devteam and help with our NodeBB plugins? 
+
+Send a chat to user exodo on http://community.nodebb.org or http://exo.do
