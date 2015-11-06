@@ -1,140 +1,136 @@
-	/**
-	 * Espero no romper nada
-	 */
+    (function () {
+    "use strict";
 
-(function () {
-	"use strict";
+    $(document).ready(function () {
+        templates.setGlobal('ignorePluginEnabled', true);
+    });
 
-	$(document).ready(function () {
-		templates.setGlobal('ignorePluginEnabled', true);
-	});
+    $(window).on('action:topic.loaded', function (event, data) {
+        //console.log(data);
+        addTopicHandlers();
+    });
+    
+    $(window).on('action:ajaxify.contentLoaded', function (event, data) {
+        /* We are in the profile */
+        //console.log(data);
+        if ($('.account-username-box').length) {
+            addProfileHandlers();
+        }
+    });
 
-	$(window).on('action:topic.loaded', function (event, data) {
-		//console.log(data);
-		addTopicHandlers();
-	});
-	
-	$(window).on('action:ajaxify.contentLoaded', function (event, data) {
-		/* Estamos en el perfil */
-		//console.log(data);
-		if ($('.account-username-box').length) {
-			addProfileHandlers();
-		}
-	});
+    function addTopicHandlers() {
+        $('.posts').on('click', 'a.ignore, a.unignore', function () {
 
-	function addTopicHandlers() {
-		$('.posts').on('click', 'a.ignore, a.unignore', function () {
+            //Execute the (un)ignore function
+            var post = $(this).parents('.post-row');
+            toggleIgnoreUser({
+                id: post.data('uid'),
+                name: post.data('username'),
+                ignored: post.is('.ignored')
+            }, toggleIgnorePosts);
 
-			//Ejecutamos la accion de des/ignorar
-			var post = $(this).parents('.post-row');
-			toggleIgnoreUser({
-				id: post.data('uid'),
-				name: post.data('username'),
-				ignored: post.is('.ignored')
-			}, toggleIgnorePosts);
+            //Close the dropdown
+            _clearMenus();
 
-			//Cerramos el dropdown
-			_clearMenus();
+            return false;
+        });
+    }
 
-			return false;
-		});
-	}
+    function addProfileHandlers() {
+        $('.account').on('click', 'a.ignore, a.unignore', function () {
 
-	function addProfileHandlers() {
-		$('.account').on('click', 'a.ignore, a.unignore', function () {
+            //Execute the (un)ignore action
+            var user = $(this).parents('.account');
+            toggleIgnoreUser({
+                id: user.data('uid'),
+                name: user.data('username'),
+                ignored: user.is('.ignored')
+            }, toggleIgnoreProfile);
 
-			//Ejecutamos la accion de des/ignorar
-			var user = $(this).parents('.account');
-			toggleIgnoreUser({
-				id: user.data('uid'),
-				name: user.data('username'),
-				ignored: user.is('.ignored')
-			}, toggleIgnoreProfile);
+            return false;
+        });
+    }
 
-			return false;
-		});
-	}
+    /**
+     * Ignore or unignore the selected user
+     */
+    function toggleIgnoreUser(user, callback) {
+        socket.emit(user.ignored ? 'modules.unignoreUser' : 'modules.ignoreUser', {
+            ignoreduid: user.id
+        }, function (err, res) {
 
-	/**
-	 * Ignora o des-ignora al usuario seleccionado
-	 */
-	function toggleIgnoreUser(user, callback) {
-		socket.emit(user.ignored ? 'modules.unignoreUser' : 'modules.ignoreUser', {
-			ignoreduid: user.id
-		}, function (err, res) {
+            if (err) {
+                return;
+            }
 
-			if (err) {
-				return;
-			}
+            user.ignored = !user.ignored;
 
-			user.ignored = !user.ignored;
+            //Show the user a warning
+            if (user.ignored) {
+                app.alert({
+                    message: 'You are now ignoring <b>' + user.name + '</b>',
+                    type: 'danger',
+                    timeout: 5000
+                });
+            } else {
+                app.alert({
+                    message: 'You are no longer ignoring <b>' + user.name + '</b>',
+                    type: 'success',
+                    timeout: 5000
+                });
+            }
 
-			//Mostramos un aviso al usuario
-			if (user.ignored) {
-				app.alert({
-					message: 'A partir de ahora dejar&aacute;s de ver todos los posts de <b>' + user.name + '</b>',
-					type: 'danger',
-					timeout: 5000
-				});
-			} else {
-				app.alert({
-					message: 'A partir de ahora volver&aacute;s a ver todos los posts de <b>' + user.name + '</b>',
-					type: 'success',
-					timeout: 5000
-				});
-			}
+            callback(user);
+        });
+    }
 
-			callback(user);
-		});
-	}
+    /**
+     * It marks as ignored all the posts of a user.
+     */
+    function toggleIgnorePosts(user) {
+        $('.post-row[data-uid=' + user.id + ']').each(function (i, post) {
+            post = $(post);
 
-	/**
-	 * Marca como ignorados todos los posts de un usuario
-	 */
-	function toggleIgnorePosts(user) {
-		$('.post-row[data-uid=' + user.id + ']').each(function (i, post) {
-			post = $(post);
+            if (user.ignored) {
 
-			if (user.ignored) {
+                //Sve the original content
+                var content = post.find('.post-content');
+                var originalContent = content.html();
 
-				//Nos guardamos el contenido original
-				var content = post.find('.post-content');
-				var originalContent = content.html();
+                //Setting the post as hidden
+                post.addClass('ignored');
+                content.html('This post is hidden because <b>' + user.name + '</b> is in your list of ignored users.');
 
-				//Ocultamos el post
-				post.addClass('ignored');
-				content.html('Este post está oculto porque <b>' + user.name + '</b> está en tu lista de ignorados.');
+                //Adding the original content next to the hidden one to be able to recover it.
+                post.find('.original-content').html(originalContent);
 
-				//Añadimos el contenido original la lado del ocultado para poder recuperarlo luego
-				post.find('.original-content').html(originalContent);
+                //                //Ignore-unignore buttons
+                //                post.find('a.ignore').hide();
+                //                post.find('a.unignore').show();
+            } else {
+                //The post is shown again
+                post.removeClass('ignored');
 
-				//				//Botones de ignorar-designorar
-				//				post.find('a.ignore').hide();
-				//				post.find('a.unignore').show();
-			} else {
-				//Mostramos de nuevo el post
-				post.removeClass('ignored');
+                //The original content is shown
+                post.find('.post-content').html(post.find('.original-content').html());
 
-				//Devolvemos el contenido original
-				post.find('.post-content').html(post.find('.original-content').html());
+                //                //Ignore-unignore buttons
+                //                post.find('a.ignore').show();
+                //                post.find('a.unignore').hide();
+            }
+        });
+    }
 
-				//				//Botones de ignorar-designorar
-				//				post.find('a.ignore').show();
-				//				post.find('a.unignore').hide();
-			}
-		});
-	}
-
-	/**
-	 * Marca como ignorado el perfil de un usuario
-	 */
-	function toggleIgnoreProfile(user) {
-		if (user.ignored) {
-			$('.account').addClass('ignored');
-		} else {
-			$('.account').removeClass('ignored');
-		}
-	}
+    /**
+     * Mark the selected user profile as ignored
+     */
+    function toggleIgnoreProfile(user) {
+        if (user.ignored) {
+            $('.account').addClass('ignored');
+        } else {
+            $('.account').removeClass('ignored');
+        }
+    }
 
 
 }());
