@@ -3,6 +3,7 @@
     
     $(window).on('action:ajaxify.contentLoaded', function (event, data) {
         /* If we are in the ignored-users screen*/
+
         if (data.url.match(/^user\/.+\/ignored$/i)) {
             $('.users.account.ignored-users').on('click', 'button.unignore', function () {
                 var userbox = $(this).parents('.users-box');
@@ -10,6 +11,12 @@
                     userbox.fadeOut();
                 });
             });
+        }
+        
+        if(data.tpl=='account/profile'){
+            console.log("Datos: "+JSON.stringify(data));
+            alert("hey entré bitch.");
+            $('.dropdown-menu.dropdown-menu-right').append('<li><a class="ignore-user" href="#" >Ignorar Usuario<a/></li>');
         }
     });
 

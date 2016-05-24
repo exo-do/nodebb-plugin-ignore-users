@@ -9,7 +9,9 @@
         async = module.parent.require('async'),
         helpers = module.parent.require('./controllers/helpers'),
         nconf = module.parent.require('nconf'),
-        templates = module.parent.require('templates.js');
+        templates = module.parent.require('templates.js'),
+        translator = require.main.require('./public/src/modules/translator');
+
 
     /**
      * Check if the post belongs to an ignored user
@@ -27,8 +29,16 @@
 
                         p.originalContent = p.content;
                         p.ignored = ignored;
-
-                        cb();
+                        if(ignored){
+                            translator.translate('[[ignored:ignored_post]]', function(translated) {
+                                console.log('Translated string:', translated);
+                                p.content = translated;
+                                cb();
+                            });
+                        }else{
+                            cb();
+                        }
+                        
 
                     });
                 } else {

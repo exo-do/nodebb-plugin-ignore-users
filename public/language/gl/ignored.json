@@ -3,7 +3,10 @@
   "unignore": "Deixar de ignorar",
   "ignored": "Ignorados",
   "ignore_user": "Ignorar usuario",
+  "unignore_user": "Deixar de ignorar",
   "ignored_list": "Lista de ignorados",
   "ignored_no_one": "No tes a ninguén na túa lista de ignorados :)",
-  "ignored_post": "Esta mensaxe está oculta porque <strong>%1</strong> está na túa lista de ignorados."
+  "ignored_post": "Esta mensaxe está oculta porque o seu autor está na túa lista de ignorados.",
+  "ignoring_confirmation": "Agora estás a ignorar a: %1.",
+	"unignoring_confirmation": "Xa non estás a ignorar a %1."
 }
