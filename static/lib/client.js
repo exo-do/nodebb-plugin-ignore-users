@@ -59,8 +59,7 @@
                     //We add the element on the page, in the place we want
                     require(['translator'], function(translator) {
                             translator.translate(translationText, function(translated) {         
-                            $('a[itemprop="author"][data-uid="'+post.uid+'"]').after('<a href="#" itemprop="ignorespot" data-uid="'+post.uid+'" class="fa '+icon+' '+className+'"></a>');
-                            $('li[component="post"][data-pid="'+post.pid+'"] div.content').after('<div class="original-content hide" component="post/original-content" itemprop="text">'+post.originalContent+'</div>');
+                            $('li[component="post"][data-pid="'+post.pid+'"]').find('a[itemprop="author"]').after('<a href="#" itemprop="ignorespot" data-uid="'+post.uid+'" class="fa '+icon+' '+className+'"></a>');
                             $('li[component="post"][data-pid="'+post.pid+'"] div.content').after('<div class="original-content hide" component="post/original-content" itemprop="text">'+post.originalContent+'</div>');
                             if(postClass!=null){
                                 $('li[component="post"][data-pid="'+post.pid+'"]').addClass('ignored');
