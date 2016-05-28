@@ -2,37 +2,16 @@
 
 ![Alt text](/nodeplugins.jpg "Exodo plugins")
 
-Plugin to ignore post from certain users
+Plugin to ignore post from certain users.
 
-Modifications on `topic.tpl`
+You can ignore an user in when browsing a topic and he/she has post on its topic. At the left of his/her username will appear an icon of an eye, pressing that icon will ignore/unignore that user.
 
-Find line
+Froim his/her user profile you are able to ignore/unignore the user too, the option is located in the profile dropdown of the user.
 
-```
-	<!-- BEGIN posts -->
-	<li class="post-row<!-- IF posts.deleted --> deleted<!-- ENDIF posts.deleted -->" ...></li>
-```
+From your profile page, you can see the list of users you are ignoring and you have the option to unignore them too from them.
 
-Add `<!-- IF posts.ignored --> ignored<!-- ENDIF posts.ignored -->` on `class` atribute:
+When you have an user ignored, you will not see his/her posts, you will see a generic text telling you that user is ignored and the posts will appear faded itself.
 
-```
-	<li class="post-row<!-- IF posts.deleted --> deleted<!-- ENDIF posts.deleted --><!-- IF posts.ignored --> ignored<!-- ENDIF posts.ignored -->"...></li>
-```
-Add buttons to ignore user :
-
-```
-	<!-- IF !posts.selfPost --> 	 	
-	<!-- IF loggedIn --> 	 	
-	<li><a href="#" class="unignore" <!-- IF !posts.ignored -->style="display: none;"<!-- ENDIF !posts.ignored -->><i class="fa fa-eye"></i> Des-Ignorar</a></li> 	 	
-	<li><a href="#" class="ignore" <!-- IF posts.ignored -->style="display: none;"<!-- ENDIF posts.ignored -->><i class="fa fa-eye-slash"></i> Ignorar usuario</a></li> 	 	
-	<!-- ENDIF loggedIn --> 	 	
-	<!-- ENDIF !posts.selfPost --> 
-```
-
-Adding content on Dom in case user press unignore:
-```
-	<div class="original-content hide" itemprop="text">{posts.originalContent}</div> 
-```
 
 Want to join devteam and help with our NodeBB plugins? 
 

@@ -25,7 +25,7 @@
 			"method": "filterIgnoredTopics"
 		}
 	],
-	"scripts": ["static/lib/topic.js"],
+	"scripts": ["static/lib/client.js"],
 	"templates": "static/templates",
 	"less": ["static/style.less"],
 	"languages": "public/language"
