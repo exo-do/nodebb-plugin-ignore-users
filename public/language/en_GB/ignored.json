@@ -1,0 +1,12 @@
+{
+    "ignore": "Ignore",
+    "unignore": "Unignore",
+	"ignored": "Ignored",
+	"ignore_user": "Ignore user",
+	"unignore_user": "Unignore user",
+	"ignored_list": "Ignored List",
+	"ignored_no_one": "Your ignore list is empty :)",
+	"ignored_post": "This message is hidden because its author is in your ignored list.",
+	"ignoring_confirmation": "You are now ignoring: %1.",
+	"unignoring_confirmation": "You are no longer ignoring %1 anymore."
+}

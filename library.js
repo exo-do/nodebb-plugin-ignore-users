@@ -9,7 +9,9 @@
         async = module.parent.require('async'),
         helpers = module.parent.require('./controllers/helpers'),
         nconf = module.parent.require('nconf'),
-        templates = module.parent.require('templates.js');
+        templates = module.parent.require('templates.js'),
+        translator = require.main.require('./public/src/modules/translator');
+
 
     /**
      * Check if the post belongs to an ignored user
@@ -27,8 +29,16 @@
 
                         p.originalContent = p.content;
                         p.ignored = ignored;
-
-                        cb();
+                        if(ignored){
+                            translator.translate('[[ignored:ignored_post]]', function(translated) {
+                                console.log('Translated string:', translated);
+                                p.content = translated;
+                                cb();
+                            });
+                        }else{
+                            cb();
+                        }
+                        
 
                     });
                 } else {
@@ -65,6 +75,7 @@
                         return helpers.notAllowed(req, res);
                     }
                     User.getIgnoredUsers(req.user.uid, next);
+                    
                 },
                 User.getUsersData
             ], function (err, users) {
@@ -72,7 +83,7 @@
                     console.err(err);
                     return helpers.notFound(req, res);
                 }
-                
+               
                 res.render('account/ignored', {
                     showSettings: true,
                     showHidden: true,
@@ -156,7 +167,6 @@
     plugin.filterIgnoredTopics = function (data, callback) {
         
         User.getIgnoredUsers(data.uid, function (err, ignoredUsers) {
-            console.log(ignoredUsers)
             if (ignoredUsers && ignoredUsers.length) {
                 data.topics.forEach(function (topic) {
                     topic.ignored = ignoredUsers.indexOf(topic.uid.toString()) !== -1;
