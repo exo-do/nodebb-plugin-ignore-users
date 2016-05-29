@@ -45,6 +45,7 @@
             var translationText,icon, className, postClass = null;
             //we have to check each topic 
             ajaxify.data.posts.forEach(function (post){
+                postClass = null;
                 if(post.uid!=app.user.uid){    
                     if(post.ignored){
                         translationText= '[[ignored:unignore_user]]';
