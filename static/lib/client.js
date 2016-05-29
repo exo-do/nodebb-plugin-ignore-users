@@ -42,32 +42,25 @@
             addProfileHandlers();
         }else if(data.tpl=='topic'){
             //We are in the topic page.
-            var translationText,icon, className, postClass = null;
+            var icon, className, postClass = null;
             //we have to check each topic 
             ajaxify.data.posts.forEach(function (post){
                 postClass = null;
                 if(post.uid!=app.user.uid){    
                     if(post.ignored){
-                        translationText= '[[ignored:unignore_user]]';
                         icon = 'fa-eye';
                         className = 'unignore';
                         postClass = 'ignored';
                     }else{
-                        translationText= '[[ignored:ignore_user]]';
                         icon = 'fa-eye-slash';
                         className = 'ignore';
                     }
-                    //We add the element on the page, in the place we want
-                    require(['translator'], function(translator) {
-                            translator.translate(translationText, function(translated) {         
-                            $('li[component="post"][data-pid="'+post.pid+'"]').find('a[itemprop="author"]').after('<a href="#" itemprop="ignorespot" data-uid="'+post.uid+'" class="fa '+icon+' '+className+'"></a>');
-                            $('li[component="post"][data-pid="'+post.pid+'"] div.content').after('<div class="original-content hide" component="post/original-content" itemprop="text">'+post.originalContent+'</div>');
-                            if(postClass!=null){
-                                $('li[component="post"][data-pid="'+post.pid+'"]').addClass('ignored');
-                            }
-                            
-                        });
-                    });
+                    //We add the element on the page, in the place we want       
+                    $('li[component="post"][data-pid="'+post.pid+'"]').find('a[itemprop="author"]').after('<a href="#" itemprop="ignorespot" data-uid="'+post.uid+'" class="fa '+icon+' '+className+'"></a>');
+                    $('li[component="post"][data-pid="'+post.pid+'"] div.content').after('<div class="original-content hide" component="post/original-content" itemprop="text">'+post.originalContent+'</div>');
+                    if(postClass!=null){
+                        $('li[component="post"][data-pid="'+post.pid+'"]').addClass('ignored');
+                    }
                 } 
           });
         }else if(data.tpl=='account/ignored'){
