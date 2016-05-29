@@ -2,7 +2,7 @@
 	"id": "nodebb-plugin-ignore-users",
 	"name": "Ignore Users Plugin for NodeBB",
 	"description": "A NodeBB plugin for ignoring posts from certain users",
-	"url": "https://github.com/NodeBB/nodebb-plugin-quickstart",
+	"url": "https://github.com/exo-do/nodebb-plugin-ignore-users",
 	"library": "./library.js",
 	"hooks": [
 		{
