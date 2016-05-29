@@ -23,5 +23,11 @@
     "nbbpm": {
     "compatibility": "^1.0.0"
   },
-  "readmeFilename": "README.md"
+  "readmeFilename": "README.md",
+  "scripts": {
+    "2npm": "publish"
+  },
+  "devDependencies": {
+    "publish": "0.5.0"
+  }
 }
