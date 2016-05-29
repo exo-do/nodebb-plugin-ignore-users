@@ -37,7 +37,7 @@
                   <i class="fa fa-pencil"></i>
                   <span class="formatted-number">{ignored.postcount}</span>
                </div>
-               <button href="#" class="btn btn-success btn-xs unignore">[[ignored:unignore]]</button>
+               <button href="#" class="btn btn-success unignore">[[ignored:unignore]]</button>
                <!-- ENDIF ignored:postcount -->
             </div>
          </li>

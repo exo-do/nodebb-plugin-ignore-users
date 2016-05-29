@@ -177,6 +177,14 @@
         })
         
     };
+    
+    /*plugin.testNotificationPushed = function name(params) {
+        
+    };
+    
+    plugin.testNotificationMerge = function name(data, callback) {
+        
+    };*/
 
     module.exports = plugin;
 }(module));
