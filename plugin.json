@@ -28,5 +28,7 @@
 	"scripts": ["static/lib/client.js"],
 	"templates": "static/templates",
 	"less": ["static/style.less"],
-	"languages": "public/language"
+	"languages": "public/language",
+	"defaultLang": "en_GB"
+
 }
