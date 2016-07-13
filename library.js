@@ -6,6 +6,7 @@
     var Socket = module.parent.require('./socket.io/modules'),
         User = module.parent.require('./user'),
         db = module.parent.require('./database'),
+        plugins = module.parent.require('./plugins'),
         async = module.parent.require('async'),
         helpers = module.parent.require('./controllers/helpers'),
         nconf = module.parent.require('nconf'),
@@ -151,6 +152,12 @@
      * It adds an user to the ignore list
      */
     Socket.ignoreUser = function (socket, data, callback) {
+        plugins.fireHook('action:plugin.ignore-users.toggled', {
+            uid: socket.uid,
+            ignoreduid: data.ignoreduid,
+            ignored: true
+        });
+
         db.setAdd('ignored:' + socket.uid, data.ignoreduid, callback);
     };
 
@@ -158,6 +165,12 @@
      * It removes an user from the ignore list
      */
     Socket.unignoreUser = function (socket, data, callback) {
+        plugins.fireHook('action:plugin.ignore-users.toggled', {
+            uid: socket.uid,
+            ignoreduid: data.ignoreduid,
+            ignored: false
+        });
+
         db.setRemove('ignored:' + socket.uid, data.ignoreduid, callback);
     };
 
