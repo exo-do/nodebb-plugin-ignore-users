@@ -23,6 +23,10 @@
 		{
 			"hook": "filter:category.topics.get",
 			"method": "filterIgnoredTopics"
+		},
+		{
+			"hook": "filter:messaging.send",
+			"method": "filterIgnoredChats"
 		}
 	],
 	"scripts": ["static/lib/client.js"],
