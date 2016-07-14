@@ -30,10 +30,18 @@
                 //If not, then he/she is visualizing another user profile, so the link must show the option to igonore the user.
                 //To show the initial value of the text in the link, we should evaluate if the user is already ignored or not.
                 var translationText = ajaxify.data.isIgnored ? '[[ignored:unignore_user]]' : '[[ignored:ignore_user]]';
-                var icon = ajaxify.data.isIgnored ? 'fa fa-eye' : 'fa fa-eye-slash';
+                var icon = ajaxify.data.isIgnored ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash';
+
+                var chatTranslationText = ajaxify.data.isIgnoredForChat ? '[[ignored:chat.unignore_user]]' : '[[ignored:chat.ignore_user]]';
+                var chatIcon = ajaxify.data.isIgnoredForChat ? 'fa fa-fw fa-volume-up' : 'fa fa-fw fa-volume-off';
+
                 require(['translator'], function(translator) {
                      translator.translate(translationText, function(translated) {
                         $('.dropdown-menu.dropdown-menu-right').append('<li><a class="ignore-user '+icon+'" href="#" >'+translated+'<a/></li>');
+                    });
+
+                     translator.translate(chatTranslationText, function(translated) {
+                        $('.dropdown-menu.dropdown-menu-right').append('<li><a class="ignore-user-chat '+chatIcon+'" href="#" >'+translated+'<a/></li>');
                     });
                 }); 
                 
@@ -96,6 +104,17 @@
 
             return false;
         });
+
+        $('.account').on('click', 'a.ignore-user-chat', function () {     
+            //Execute the (un)ignore action for chat
+            toggleIgnoreUserForChat({
+                id: ajaxify.data.uid,
+                name: ajaxify.data.username,
+                ignored: ajaxify.data.isIgnoredForChat
+            }, toggleIgnoreProfileForChat);
+
+            return false;
+        });
     }
     
     function addIgnoredListHandlers() {
@@ -125,6 +144,35 @@
 
             //Show the user a warning
             var translationString = user.ignored ? '[[ignored:unignoring_confirmation,'+user.name+']]' : '[[ignored:ignoring_confirmation,'+user.name+']]';
+            
+            require(['translator'], function(translator) {
+                translator.translate(translationString, function(translated) {
+                        app.alert({
+                            message: translated,
+                            type: 'success',
+                            timeout: 5000
+                        });
+                    });
+                }); 
+
+            callback(user);
+        });
+    }
+
+    /**
+     * Ignore or unignore the selected user for chat
+     */
+    function toggleIgnoreUserForChat(user, callback) {
+        socket.emit(user.ignored ? 'modules.unignoreUserForChat' : 'modules.ignoreUserForChat', {
+            ignoreduid: user.id
+        }, function (err, res) {
+
+            if (err) {
+                return;
+            }
+
+            //Show the user a warning
+            var translationString = user.ignored ? '[[ignored:chat.unignoring_confirmation,'+user.name+']]' : '[[ignored:chat.ignoring_confirmation,'+user.name+']]';
             
             require(['translator'], function(translator) {
                 translator.translate(translationString, function(translated) {
@@ -191,6 +239,25 @@
         }); 
             
         ajaxify.data.isIgnored = !user.ignored;
+        
+    }
+
+    /**
+     * Mark the selected user profile as ignored for chat
+     */
+    function toggleIgnoreProfileForChat(user) {
+        
+        var textToTranslate = !ajaxify.data.isIgnoredForChat ? '[[ignored:chat.unignore_user]]' : '[[ignored:chat.ignore_user]]';
+        
+        require(['translator'], function(translator) {
+        translator.translate(textToTranslate, function(translated) {
+                $('a.ignore-user-chat').text(translated);
+                $('a.ignore-user-chat').toggleClass('fa-volume-off');
+                $('a.ignore-user-chat').toggleClass('fa-volume-up');
+            });
+        }); 
+            
+        ajaxify.data.isIgnoredForChat = !user.ignored;
         
     }
     

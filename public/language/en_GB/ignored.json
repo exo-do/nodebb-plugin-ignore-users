@@ -8,5 +8,14 @@
 	"ignored_no_one": "Your ignore list is empty :)",
 	"ignored_post": "This message is hidden because its author is in your ignored list.",
 	"ignoring_confirmation": "You are now ignoring: %1.",
-	"unignoring_confirmation": "You are no longer ignoring %1 anymore."
+	"unignoring_confirmation": "You are no longer ignoring %1 anymore.",
+	"chat.ignore": "Ignore Chats",
+    "chat.unignore": "Unignore Chats",
+	"chat.ignored": "Ignored Chats",
+	"chat.ignore_user": "Ignore user's chats",
+	"chat.unignore_user": "Unignore user's chats",
+	"chat.ignored_list": "Ignored List for Chats",
+	"chat.ignored_no_one": "Your ignore list for chats is empty :)",
+	"chat.ignoring_confirmation": "You are now ignoring %1's chats",
+	"chat.unignoring_confirmation": "You are no longer ignoring %1's chats anymore."
 }

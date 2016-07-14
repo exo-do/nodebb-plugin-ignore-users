@@ -6,6 +6,7 @@
     var Socket = module.parent.require('./socket.io/modules'),
         User = module.parent.require('./user'),
         db = module.parent.require('./database'),
+        plugins = module.parent.require('./plugins'),
         async = module.parent.require('async'),
         helpers = module.parent.require('./controllers/helpers'),
         nconf = module.parent.require('nconf'),
@@ -115,13 +116,17 @@
     plugin.checkIgnoredAccount = function (data, callback) {
         try {
             if (data.uid && data.uid !== data.userData.uid) {
-                User.isIgnored(data.uid, data.userData.uid, function (err, ignored) {
+                async.parallel({
+                    isIgnored: async.apply(User.isIgnored, data.uid, data.userData.uid),
+                    isIgnoredForChat: async.apply(User.isIgnoredForChat, data.uid, data.userData.uid),
+                }, function(err, ignored) {
                     if (err) {
                         console.error("[PROFILE] Error while checking if an user is ignored " + data.userData.uid, e);
                         return callback(null, data);
                     }
                     
-                    data.userData.isIgnored = ignored;
+                    data.userData.isIgnored = ignored.isIgnored;
+                    data.userData.isIgnoredForChat = ignored.isIgnoredForChat;
                     callback(null, data);
                 });
             } else {
@@ -151,6 +156,12 @@
      * It adds an user to the ignore list
      */
     Socket.ignoreUser = function (socket, data, callback) {
+        plugins.fireHook('action:plugin.ignore-users.toggled', {
+            uid: socket.uid,
+            ignoreduid: data.ignoreduid,
+            ignored: true
+        });
+
         db.setAdd('ignored:' + socket.uid, data.ignoreduid, callback);
     };
 
@@ -158,7 +169,53 @@
      * It removes an user from the ignore list
      */
     Socket.unignoreUser = function (socket, data, callback) {
+        plugins.fireHook('action:plugin.ignore-users.toggled', {
+            uid: socket.uid,
+            ignoreduid: data.ignoreduid,
+            ignored: false
+        });
+
         db.setRemove('ignored:' + socket.uid, data.ignoreduid, callback);
+    };
+
+    /**
+     * It checks if an user (uid) has another user (otheruid) in the chat ignore list
+     */
+    User.isIgnoredForChat = function (uid, otheruid, callback) {
+        db.isSetMember('ignored:chat:' + uid, otheruid, callback);
+    };
+
+    /**
+     * It returns an user's chat ignore list
+     */
+    User.getIgnoredUsersForChat = function (uid, callback) {
+        db.getSetMembers('ignored:chat:' + uid, callback);
+    };
+
+    /**
+     * It adds an user to the chat ignore list
+     */
+    Socket.ignoreUserForChat = function (socket, data, callback) {
+        plugins.fireHook('action:plugin.ignore-users.chat.toggled', {
+            uid: socket.uid,
+            ignoreduid: data.ignoreduid,
+            ignored: true
+        });
+
+        db.setAdd('ignored:chat:' + socket.uid, data.ignoreduid, callback);
+    };
+
+    /**
+     * It removes an user from the chat ignore list
+     */
+    Socket.unignoreUserForChat = function (socket, data, callback) {
+        plugins.fireHook('action:plugin.ignore-users.chat.toggled', {
+            uid: socket.uid,
+            ignoreduid: data.ignoreduid,
+            ignored: false
+        });
+
+        db.setRemove('ignored:chat:' + socket.uid, data.ignoreduid, callback);
     };
 
     /**
@@ -176,6 +233,28 @@
             callback(null, data);
         })
         
+    };
+
+    /**
+     * If a user attempts to message somebody who has ignored them, show them an error message
+     */
+    plugin.filterIgnoredChats = function (chats, callback) {
+        console.log(chats.data.roomId);
+        db.getSortedSetRevRange('chat:room:' + chats.data.roomId + ':uids', 0, -1, function(err, uids) {
+            console.log(uids);
+            async.each(uids, function(uid, next) {
+                User.isIgnoredForChat(uid, chats.uid, function(err, ignored) {
+                    if (ignored) {
+                        return next(new Error('[[error:chat-restricted]]'));
+                    }
+
+                    next(null);
+                });
+            }, function(err) {
+                return callback(err, chats);
+            });
+        });
+        //User.isIgnoredForChat(data., otheruid
     };
     
     /*plugin.testNotificationPushed = function name(params) {

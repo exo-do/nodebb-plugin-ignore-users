@@ -1,6 +1,6 @@
 {
   "name": "nodebb-plugin-ignore-users",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A NodeBB plugin for ignoring posts from certain users",
   "main": "library.js",
   "repository": {
@@ -21,7 +21,7 @@
     "url": "https://github.com/exo-do/nodebb-plugin-ignore-users/issues"
   },
     "nbbpm": {
-    "compatibility": "^1.0.0"
+    "compatibility": "^1.1.0"
   },
   "readmeFilename": "README.md",
   "scripts": {
