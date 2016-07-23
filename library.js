@@ -152,6 +152,13 @@
         db.getSetMembers('ignored:' + uid, callback);
     };
 
+        /**
+     * It returns an user's ignore list
+     */
+    User.getIgnoredByUsers = function (uid, callback) {
+        db.getSetMembers('ignored:by:' + uid, callback);
+    };
+
     /**
      * It adds an user to the ignore list
      */
@@ -162,7 +169,10 @@
             ignored: true
         });
 
+        //Users that the actual user is ignoring.
         db.setAdd('ignored:' + socket.uid, data.ignoreduid, callback);
+        //Sets of users ignoring a certain user.
+        db.setAdd('ignored:by:' + data.ignoreduid, socket.uid, callback);
     };
 
     /**
@@ -176,6 +186,7 @@
         });
 
         db.setRemove('ignored:' + socket.uid, data.ignoreduid, callback);
+        db.setRemove('ignored:by:' + data.ignoreduid,socket.uid , callback);
     };
 
     /**
@@ -257,13 +268,27 @@
         //User.isIgnoredForChat(data., otheruid
     };
     
-    /*plugin.testNotificationPushed = function name(params) {
+    /**
+     * If an user is ignoring another user and that user is generating a notification, dont push the notification to the ignoring user.
+     * filter:notification.push
+     * filter:notifications.merge
+     */
+    plugin.notificationManagement = function name(params,callback) {
+        console.log("This are the params: "+ params);
+        var realUidsToIgnore = [];
+        User.getIgnoredByUsers(params.notification.from, function (err, ignoredByUsers) {
+            if (ignoredByUsers && ignoredByUsers.length) {
+                params.uids.forEach(function (uid) {
+                    if(ignoredByUsers.indexOf(uid) == -1){
+                        realUidsToIgnore.push(uid);
+                    }
+                });
+                params.uids = realUidsToIgnore;
+            }
+            callback(null, params);
+        })
         
     };
-    
-    plugin.testNotificationMerge = function name(data, callback) {
-        
-    };*/
 
     module.exports = plugin;
 }(module));

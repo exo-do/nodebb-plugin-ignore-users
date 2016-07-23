@@ -27,6 +27,14 @@
 		{
 			"hook": "filter:messaging.send",
 			"method": "filterIgnoredChats"
+		},
+		{
+			"hook": "filter:notification.push",
+			"method": "notificationManagement"
+		},
+		{
+			"hook:": "filter:notifications.merge",
+			"method": "notificationManagement"
 		}
 	],
 	"scripts": ["static/lib/client.js"],
