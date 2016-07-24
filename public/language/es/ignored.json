@@ -8,5 +8,14 @@
 	"ignored_no_one": "No tienes a nadie en tu lista de ignorados :)",
 	"ignored_post": "Este mensaje está oculto porque su autor está en tu lista de ignorados.",
 	"ignoring_confirmation": "Ahora estás ignorando a: %1.",
-	"unignoring_confirmation": "Ya no estás ignorando a %1."
+	"unignoring_confirmation": "Ya no estás ignorando a %1.",
+	"chat.ignore": "Ignorar chats",
+    "chat.unignore": "Dejar de ignorar chats",
+	"chat.ignored": "Chats ignorados",
+	"chat.ignore_user": "Ignorar chats de este usuario",
+	"chat.unignore_user": "Dejar de ignorar chats de este usuario",
+	"chat.ignored_list": "Lista de chats ignorados",
+	"chat.ignored_no_one": "Tu lista de chats ignorados está vacía :)",
+	"chat.ignoring_confirmation": "Desde ahora estás ignorando los chats de %1.",
+	"chat.unignoring_confirmation": "Has dejado de ignorar los chats de %1."
 }
