@@ -33,8 +33,20 @@
 			"method": "notificationManagement"
 		},
 		{
-			"hook:": "filter:notifications.merge",
+			"hook": "filter:notifications.merge",
 			"method": "notificationManagement"
+		},
+		{
+			"hook": "filter:sockets.sendNewPostToUids",
+			"method": "unreadManagement"
+		},
+		{
+			"hook": "filter:post.save",
+			"method": "unreadOmmitment"
+		},
+		{
+			"hook": "action:post.save",
+			"method": "markAsReadIfNeccesary"
 		}
 	],
 	"scripts": ["static/lib/client.js"],

@@ -11,8 +11,8 @@
         helpers = module.parent.require('./controllers/helpers'),
         nconf = module.parent.require('nconf'),
         templates = module.parent.require('templates.js'),
+        Topics = module.parent.require('./topics'),
         translator = require.main.require('./public/src/modules/translator');
-
 
     /**
      * Check if the post belongs to an ignored user
@@ -32,7 +32,6 @@
                         p.ignored = ignored;
                         if(ignored){
                             translator.translate('[[ignored:ignored_post]]', function(translated) {
-                                console.log('Translated string:', translated);
                                 p.content = translated;
                                 cb();
                             });
@@ -250,9 +249,7 @@
      * If a user attempts to message somebody who has ignored them, show them an error message
      */
     plugin.filterIgnoredChats = function (chats, callback) {
-        console.log(chats.data.roomId);
         db.getSortedSetRevRange('chat:room:' + chats.data.roomId + ':uids', 0, -1, function(err, uids) {
-            console.log(uids);
             async.each(uids, function(uid, next) {
                 User.isIgnoredForChat(uid, chats.uid, function(err, ignored) {
                     if (ignored) {
@@ -274,21 +271,86 @@
      * filter:notifications.merge
      */
     plugin.notificationManagement = function name(params,callback) {
-        console.log("This are the params: "+ params);
-        var realUidsToIgnore = [];
+        var filteredUids = [];
+        if(params.notification!=null){
         User.getIgnoredByUsers(params.notification.from, function (err, ignoredByUsers) {
             if (ignoredByUsers && ignoredByUsers.length) {
                 params.uids.forEach(function (uid) {
                     if(ignoredByUsers.indexOf(uid) == -1){
-                        realUidsToIgnore.push(uid);
+                        filteredUids.push(uid);
                     }
                 });
-                params.uids = realUidsToIgnore;
+                params.uids = filteredUids;
             }
             callback(null, params);
         })
-        
+        }else{
+            callback(null, params);
+        }
     };
+
+    /**
+    * If an user is ignore another user, the topics where the second writes, doesn't make the topic appear in the unread list of the first.
+    * hooks:
+    *        filter:unread.build 
+    */
+    plugin.unreadManagement = function name(params,callback) {
+        var filteredUids = [];
+        User.getIgnoredByUsers(params.uidFrom, function (err, ignoredByUsers) {
+            if (ignoredByUsers && ignoredByUsers.length) {
+                params.uidsTo.forEach(function (uid) {
+                    if(ignoredByUsers.indexOf(uid) == -1){
+                        filteredUids.push(uid);
+                    }
+                });
+                params.uidsTo = filteredUids;
+            }
+            callback(null, params);
+        })
+    };
+
+    /**
+    * When a post is saved, evaluate if the user that writes the posts is ignored by anyone. In that case mark the post as already read
+    * for them, that way the post will not show on they unread message box. 
+    * hooks:
+    *        filter:post.save
+    */
+    plugin.unreadOmmitment = function name(data,callback) {
+        User.getIgnoredByUsers(data.uid, function (err, ignoredByUsers) {
+            if (ignoredByUsers && ignoredByUsers.length && ignoredByUsers[0]!=null) {
+                ignoredByUsers.forEach(function (uid) {
+                    var markAsReadUids = [];
+                    Topics.getUnreadTids(0, uid, null, function(err,tids){
+                        if(tids && tids.indexOf(data.tid) === -1){
+                            markAsReadUids.push(uid);
+                        }
+                        data.markAsReadUids = markAsReadUids;
+                        callback(null, data);
+                    });
+                });
+            }else{
+                data.markAsReadUids = [];
+                callback(null, data);
+            }
+        })
+    };
+
+    /**
+     * Processes the mark as read action over a list of uids for a certain post. That list of uids has been calculated previously
+     * in the filter:post.save.
+     * hooks:
+     *      action:post.save
+     */
+    plugin.markAsReadIfNeccesary = function name(data) {
+        //Mark the post read for the user thats ignoring the author.
+        if(data.markAsReadUids!=null){
+            data.markAsReadUids.forEach(function (uid) {
+                var tids = [];
+                tids.push(data.tid);
+                Topics.markAsRead(tids, uid);
+            });
+        }
+    }
 
     module.exports = plugin;
 }(module));
