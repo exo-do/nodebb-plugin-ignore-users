@@ -8,13 +8,13 @@
     $(window).on('action:topic.loaded', function (event, data) {
         addTopicHandlers();
     });
-    
+
     function replaceParams(string, replacements) {
         return string.replace(/\{(\d+)\}/g, function() {
             return replacements[arguments[1]];
         });
     }
-    
+
     $(window).on('action:ajaxify.contentLoaded', function (event, data) {
         /* We are in the profile */
         if (data.tpl=='account/profile') {
@@ -22,10 +22,10 @@
             if(parseInt(ajaxify.data.yourid,10)===parseInt(ajaxify.data.theirid,10)){
                 require(['translator'], function(translator) {
                      translator.translate('[[ignored:ignored_list]]', function(translated) {
-                        $('.dropdown-menu.dropdown-menu-right').append('<li><a class="ignored-list fa fa-eye-slash" href="/'+data.url+'/ignored" >'+translated+'<a/></li>');
+                        $('.dropdown-menu.dropdown-menu-right').append('<li><a class="ignored-list" href="/'+data.url+'/ignored" ><i class=" fa fa-eye-slash"></i> '+translated+'</a></li>');
                     });
-                }); 
-                
+                });
+
             }else{
                 //If not, then he/she is visualizing another user profile, so the link must show the option to igonore the user.
                 //To show the initial value of the text in the link, we should evaluate if the user is already ignored or not.
@@ -37,24 +37,24 @@
 
                 require(['translator'], function(translator) {
                      translator.translate(translationText, function(translated) {
-                        $('.dropdown-menu.dropdown-menu-right').append('<li><a class="ignore-user '+icon+'" href="#" >'+translated+'<a/></li>');
+                        $('.dropdown-menu.dropdown-menu-right').append('<li><a class="ignore-user" href="#" ><i class="'+icon+'"></i> <span class="ignore-user-text">'+translated+'</span></a></li>');
                     });
 
                      translator.translate(chatTranslationText, function(translated) {
-                        $('.dropdown-menu.dropdown-menu-right').append('<li><a class="ignore-user-chat '+chatIcon+'" href="#" >'+translated+'<a/></li>');
+                        $('.dropdown-menu.dropdown-menu-right').append('<li><a class="ignore-user-chat" href="#" ><i class="'+chatIcon+'"></i> <span class="ignore-user-chat-text">'+translated+'</span></a></li>');
                     });
-                }); 
-                
+                });
+
             }
-            
+
             addProfileHandlers();
         }else if(data.tpl=='topic'){
             //We are in the topic page.
             var icon, className, postClass = null;
-            //we have to check each topic 
+            //we have to check each topic
             ajaxify.data.posts.forEach(function (post){
                 postClass = null;
-                if(post.uid!=app.user.uid){    
+                if(post.uid!=app.user.uid){
                     if(post.ignored){
                         icon = 'fa-eye';
                         className = 'unignore';
@@ -63,13 +63,13 @@
                         icon = 'fa-eye-slash';
                         className = 'ignore';
                     }
-                    //We add the element on the page, in the place we want       
+                    //We add the element on the page, in the place we want
                     $('li[component="post"][data-pid="'+post.pid+'"]').find('a[itemprop="author"]').after('<a href="#" itemprop="ignorespot" data-uid="'+post.uid+'" class="fa '+icon+' '+className+'"></a>');
                     $('li[component="post"][data-pid="'+post.pid+'"] div.content').after('<div class="original-content hide" component="post/original-content" itemprop="text">'+post.originalContent+'</div>');
                     if(postClass!=null){
                         $('li[component="post"][data-pid="'+post.pid+'"]').addClass('ignored');
                     }
-                } 
+                }
           });
         }else if(data.tpl=='account/ignored'){
             //Add ignored user list listeners.
@@ -94,7 +94,7 @@
     }
 
     function addProfileHandlers() {
-        $('.account').on('click', 'a.ignore-user, a.unignore-user', function () {     
+        $('.account').on('click', 'a.ignore-user, a.unignore-user', function () {
             //Execute the (un)ignore action
             toggleIgnoreUser({
                 id: ajaxify.data.uid,
@@ -105,7 +105,7 @@
             return false;
         });
 
-        $('.account').on('click', 'a.ignore-user-chat', function () {     
+        $('.account').on('click', 'a.ignore-user-chat', function () {
             //Execute the (un)ignore action for chat
             toggleIgnoreUserForChat({
                 id: ajaxify.data.uid,
@@ -116,7 +116,7 @@
             return false;
         });
     }
-    
+
     function addIgnoredListHandlers() {
         $('.users-container').on('click', 'button.unignore', function () {
             //Execute the (un)ignore action
@@ -144,7 +144,7 @@
 
             //Show the user a warning
             var translationString = user.ignored ? '[[ignored:unignoring_confirmation,'+user.name+']]' : '[[ignored:ignoring_confirmation,'+user.name+']]';
-            
+
             require(['translator'], function(translator) {
                 translator.translate(translationString, function(translated) {
                         app.alert({
@@ -153,7 +153,7 @@
                             timeout: 5000
                         });
                     });
-                }); 
+                });
 
             callback(user);
         });
@@ -173,7 +173,7 @@
 
             //Show the user a warning
             var translationString = user.ignored ? '[[ignored:chat.unignoring_confirmation,'+user.name+']]' : '[[ignored:chat.ignoring_confirmation,'+user.name+']]';
-            
+
             require(['translator'], function(translator) {
                 translator.translate(translationString, function(translated) {
                         app.alert({
@@ -182,7 +182,7 @@
                             timeout: 5000
                         });
                     });
-                }); 
+                });
 
             callback(user);
         });
@@ -203,7 +203,7 @@
                     $('a[itemprop="ignorespot"][data-uid="'+post.attr('data-uid')+'"]').removeClass('ignore').addClass('unignore').removeClass('fa-eye-slash').addClass('fa-eye');
                     iconsHasBeenChanged= true;
                 }
-                
+
                 require(['translator'], function(translator) {
                     translator.translate('[[ignored:ignored_post]]', function(translated) {
                         post.find('.content').html(translated);
@@ -227,47 +227,51 @@
      * Mark the selected user profile as ignored
      */
     function toggleIgnoreProfile(user) {
-        
+
         var textToTranslate = !ajaxify.data.isIgnored ? '[[ignored:unignore_user]]' : '[[ignored:ignore_user]]';
-        
+
         require(['translator'], function(translator) {
         translator.translate(textToTranslate, function(translated) {
-                $('a.ignore-user').text(translated);
-                $('a.ignore-user').toggleClass('fa-eye-slash');
-                $('a.ignore-user').toggleClass('fa-eye');
+
+                $('span.ignore-user-text').html(translated);
+                $('a.ignore-user > i').toggleClass('fa-eye-slash');
+                $('a.ignore-user > i').toggleClass('fa-eye');
+                $('.in,.open').removeClass('in open');
             });
-        }); 
-            
+        });
+
         ajaxify.data.isIgnored = !user.ignored;
-        
+
     }
 
     /**
      * Mark the selected user profile as ignored for chat
      */
     function toggleIgnoreProfileForChat(user) {
-        
+
         var textToTranslate = !ajaxify.data.isIgnoredForChat ? '[[ignored:chat.unignore_user]]' : '[[ignored:chat.ignore_user]]';
-        
+
         require(['translator'], function(translator) {
         translator.translate(textToTranslate, function(translated) {
-                $('a.ignore-user-chat').text(translated);
-                $('a.ignore-user-chat').toggleClass('fa-volume-off');
-                $('a.ignore-user-chat').toggleClass('fa-volume-up');
+
+                $('span.ignore-user-chat-text').html(translated);
+                $('a.ignore-user-chat > i').toggleClass('fa-volume-off');
+                $('a.ignore-user-chat > i').toggleClass('fa-volume-up');
+                $('.in,.open').removeClass('in open');
             });
-        }); 
-            
+        });
+
         ajaxify.data.isIgnoredForChat = !user.ignored;
-        
+
     }
-    
+
         /**
      * Mark the selected user profile as ignored
      */
     function toggleIgnoreList(user) {
-        
+
         var textToTranslate = !ajaxify.data.isIgnored ? '[[ignored:unignore_user]]' : '[[ignored:ignore_user]]';
-        
+
         require(['translator'], function(translator) {
         translator.translate(textToTranslate, function(translated) {
                 $('li.users-box.registered-user[data-uid="'+user.id+'"]').remove();
@@ -277,14 +281,14 @@
                         translator.translate('[[ignored:ignored_no_one]]', function(translated) {
                             $('#users-container').append('<div id="no-ignored-notice" class="alert alert-success">'+translated+'</div>');
                        });
-                    }); 
-                    
+                    });
+
                 }
             });
-        }); 
-            
+        });
+
         ajaxify.data.isIgnored = !user.ignored;
-        
+
     }
 
 
