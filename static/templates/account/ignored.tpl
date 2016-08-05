@@ -6,7 +6,7 @@
       </div>
       <ul id="users-container" class="users-container">
          <!-- BEGIN ignored -->
-         <li class="users-box registered-user" data-uid="{ignored.uid}">
+         <li class="users-box registered-user" style="margin-left:10px;" data-uid="{ignored.uid}">
             <a href="{config.relative_path}/user/{ignored.userslug}">
                <!-- IF ignored.picture -->
                <img src="{ignored.picture}" />
@@ -21,7 +21,7 @@
                <a href="{config.relative_path}/user/{ignored.userslug}">{ignored.username}</a>
                </span>
                <br/>
-               <!-- IF ignored:joindate -->
+               <!--<!-- IF ignored:joindate -->
                <div title="joindate" class="joindate">
                   <span class="timeago" title="{ignored.joindateISO}"></span>
                </div>
@@ -37,7 +37,8 @@
                   <i class="fa fa-pencil"></i>
                   <span class="formatted-number">{ignored.postcount}</span>
                </div>
-               <button href="#" class="btn btn-success unignore">[[ignored:unignore]]</button>
+             -->
+               <button href="#" class="btn btn-sm btn-success unignore">[[ignored:unignore]]</button>
                <!-- ENDIF ignored:postcount -->
             </div>
          </li>
