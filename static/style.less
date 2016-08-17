@@ -1,6 +1,35 @@
-.ignored {
+.ignored>.clearfix {
 	opacity: 0.3;
 	transition: opacity 1s ease 0.5s;
+}
+.ignored>.content {
+	opacity: 0.3;
+	transition: opacity 1s ease 0.5s;
+}
+
+.ignored>.links-bar {
+	opacity: 0.3;
+	transition: opacity 1s ease 0.5s;
+}
+
+.ignored>content {
+	opacity: 0.3;
+	transition: opacity 1s ease 0.5s;
+	.links-bar{
+		opacity: 1;
+	}
+}
+
+li.ignored>.clearfix>.post-details {
+    display: none;
+}
+
+li.ignored>.clearfix>.content {
+    min-height: 50px;
+}
+
+li.ignored>.box>.sub-content.post-footer{
+	display:none;
 }
 
 .post-row:not(.ignored) a.ignore {
