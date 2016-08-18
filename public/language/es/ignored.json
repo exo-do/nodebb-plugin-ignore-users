@@ -5,6 +5,7 @@
 	"ignore_user": "Ignorar usuario",
 	"unignore_user": "Dejar de ignorar",
 	"ignored_list": "Lista de ignorados",
+	"chat_ignored_list":"Lista de chats ignorados",
 	"ignored_no_one": "No tienes a nadie en tu lista de ignorados :)",
 	"ignored_post": "Este mensaje está oculto porque su autor está en tu lista de ignorados.",
 	"ignoring_confirmation": "Ahora estás ignorando a: %1.",

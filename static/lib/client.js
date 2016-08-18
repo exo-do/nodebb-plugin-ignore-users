@@ -128,6 +128,17 @@
 
             return false;
         });
+
+         $('.users-container').on('click', 'button.unignoreForChat', function () {
+            //Execute the (un)ignore chat action
+            toggleIgnoreUserForChat({
+                id: $(this).parent().parent().attr('data-uid'),
+                name: $(this).parent().find('a').html(),
+                ignored: true
+            }, toggleIgnoreListForChat);
+
+            return false;
+        });
     }
 
     /**
@@ -189,7 +200,7 @@
     }
 
     /**
-     * It marks as ignored all the posts of a user.
+     * It marks as ignored all the posts of an user.
      */
     function toggleIgnorePosts(user) {
         var iconsHasBeenChanged = false;
@@ -215,6 +226,11 @@
                 //The original content is shown
                 post.find('.content').html(post.find('.original-content').html());
                 post.removeClass('ignored');
+                //Trigger the image processing in the viewport.
+                require(['forum/topic/posts'], function(posts) {
+                    posts.unloadImages(post);
+                    posts.loadImages();
+                });
                 if(!iconsHasBeenChanged){
                     $('a[itemprop="ignorespot"][data-uid="'+post.attr('data-uid')+'"]').removeClass('unignore').addClass('ignore').removeClass('fa-eye').addClass('fa-eye-slash');
                     iconsHasBeenChanged= true;
@@ -265,7 +281,7 @@
 
     }
 
-        /**
+    /**
      * Mark the selected user profile as ignored
      */
     function toggleIgnoreList(user) {
@@ -274,15 +290,39 @@
 
         require(['translator'], function(translator) {
         translator.translate(textToTranslate, function(translated) {
-                $('li.users-box.registered-user[data-uid="'+user.id+'"]').remove();
-                if($('li.users-box.registered-user').size()==0){
+                $('li.users-box.registered-user.ignored-for-posts[data-uid="'+user.id+'"]').remove();
+                if($('li.users-box.registered-user.ignored-for-posts').size()==0){
                     //We show the message of empty ignored list according to the tpl.
                     require(['translator'], function(translator) {
                         translator.translate('[[ignored:ignored_no_one]]', function(translated) {
                             $('#users-container').append('<div id="no-ignored-notice" class="alert alert-success">'+translated+'</div>');
                        });
                     });
+                }
+            });
+        });
 
+        ajaxify.data.isIgnored = !user.ignored;
+
+    }
+
+    /**
+     * Mark the selected user profile as ignored for chat
+     */
+    function toggleIgnoreListForChat(user) {
+
+        var textToTranslate = !ajaxify.data.isIgnored ? '[[ignored:chat.unignore_user]]' : '[[ignored:chat.ignore_user]]';
+
+        require(['translator'], function(translator) {
+        translator.translate(textToTranslate, function(translated) {
+                $('li.users-box.registered-user.ignoreForChat[data-uid="'+user.id+'"]').remove();
+                if($('li.users-box.registered-user.ignoreForChat').size()==0){
+                    //We show the message of empty ignored list according to the tpl.
+                    require(['translator'], function(translator) {
+                        translator.translate('[[ignored:chat.ignored_no_one]]', function(translated) {
+                            $('#users-container-for-chat').append('<div id="no-ignored-for-chat-notice" class="alert alert-success">'+translated+'</div>');
+                       });
+                    });
                 }
             });
         });

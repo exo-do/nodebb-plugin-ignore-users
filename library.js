@@ -75,22 +75,34 @@
                         return helpers.notAllowed(req, res);
                     }
                     User.getIgnoredUsers(req.user.uid, next);
-                    
                 },
                 User.getUsersData
-            ], function (err, users) {
+            ], function (err, users,usersChat) {
+                var usersIgnored = users;
                 if (err) {
                     console.err(err);
                     return helpers.notFound(req, res);
                 }
-               
-                res.render('account/ignored', {
-                    showSettings: true,
-                    showHidden: true,
-                    isSelf: true,
-                    userslug: req.params.userslug,
-                    ignored: users,
-                    ignoredCount: users.length
+               async.waterfall([
+                   function(next,users){
+                       User.getIgnoredUsersForChat(req.user.uid, next);
+                   },
+                   User.getUsersData
+                   ],function (err,usersChat) {
+                if (err) {
+                    console.err(err);
+                    return helpers.notFound(req, res);
+                }
+                    res.render('account/ignored', {
+                        showSettings: true,
+                        showHidden: true,
+                        isSelf: true,
+                        userslug: req.params.userslug,
+                        ignored: users,
+                        ignoredForChat:usersChat,
+                        ignoredCount: users.length,
+                        ignoreChatCount: usersChat.length
+                    });
                 });
             });
 
