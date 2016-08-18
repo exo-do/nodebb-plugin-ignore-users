@@ -326,6 +326,7 @@
     * for them, that way the post will not show on they unread message box. 
     * hooks:
     *        filter:post.save
+    * TO-DO: replace function with async calling.
     */
     plugin.unreadOmmitment = function name(data,callback) {
         User.getIgnoredByUsers(data.uid, function (err, ignoredByUsers) {
@@ -335,15 +336,14 @@
                     Topics.getUnreadTids(0, uid, null, function(err,tids){
                         if(tids && tids.indexOf(data.tid) === -1){
                             markAsReadUids.push(uid);
-                        }
-                        data.markAsReadUids = markAsReadUids;
-                        callback(null, data);
+                            data.markAsReadUids = markAsReadUids;
+                        }                   
                     });
                 });
             }else{
                 data.markAsReadUids = [];
-                callback(null, data);
             }
+            callback(null, data);
         })
     };
 
