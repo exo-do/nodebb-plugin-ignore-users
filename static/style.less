@@ -1,8 +1,11 @@
 /** IMPORTANT: Edit your class hierarchy here, in order to hide the elements you need in the post.
-This changes are theme dependent. (The following are for nodebb-theme-exodus) 
-Coment this block and uncomment the following commented block for nodebb-theme-persona. 
+This changes can be theme dependent. (The following are for nodebb-theme-exodus and nodebb-theme-persona) 
+Feel free to add yours if the final result is not achieved on your theme and submitt a pull request on the repository to 
+support it. 
 **/
-.ignored{
+
+/**Rules for nodebb-theme-exodus**/
+li.ignored>.box{
 	opacity: 0.3;
 	transition: opacity 1s ease 0.5s;
 }
@@ -17,12 +20,12 @@ li.ignored>.box>.right-content>.content {
 li.ignored>.box>.right-content>.sub-content.post-footer{
 	display:none;
 }
-//Final of changes theme dependent.
 
-/** Css rules for hiding elements on nodebb-theme-persona
-**
-**/
-
+/**Rule for nodebb-theme-persona**/
+li.ignored>.content{
+	opacity: 0.3;
+	transition: opacity 1s ease 0.5s;
+}
 
 .post-row:not(.ignored) a.ignore {
 	display: block !important;
