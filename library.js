@@ -285,17 +285,17 @@
     plugin.notificationManagement = function name(params,callback) {
         var filteredUids = [];
         if(params.notification!=null){
-        User.getIgnoredByUsers(params.notification.from, function (err, ignoredByUsers) {
-            if (ignoredByUsers && ignoredByUsers.length) {
-                params.uids.forEach(function (uid) {
-                    if(ignoredByUsers.indexOf(uid) == -1){
-                        filteredUids.push(uid);
-                    }
-                });
-                params.uids = filteredUids;
-            }
-            callback(null, params);
-        })
+            User.getIgnoredByUsers(params.notification.from, function (err, ignoredByUsers) {
+                if (ignoredByUsers && ignoredByUsers.length) {
+                    params.uids.forEach(function (uid) {
+                        if(ignoredByUsers.indexOf(uid) == -1){
+                            filteredUids.push(uid);
+                        }
+                    });
+                    params.uids = filteredUids;
+                }
+                callback(null, params);
+            })
         }else{
             callback(null, params);
         }
@@ -326,25 +326,37 @@
     * for them, that way the post will not show on they unread message box. 
     * hooks:
     *        filter:post.save
-    * TO-DO: replace function with async calling.
     */
     plugin.unreadOmmitment = function name(data,callback) {
-        User.getIgnoredByUsers(data.uid, function (err, ignoredByUsers) {
-            if (ignoredByUsers && ignoredByUsers.length && ignoredByUsers[0]!=null) {
-                ignoredByUsers.forEach(function (uid) {
-                    var markAsReadUids = [];
-                    Topics.getUnreadTids(0, uid, null, function(err,tids){
-                        if(tids && tids.indexOf(data.tid) === -1){
-                            markAsReadUids.push(uid);
-                            data.markAsReadUids = markAsReadUids;
-                        }                   
+
+         async.waterfall([
+                function (next) {
+                    User.getIgnoredByUsers(data.uid, next);
+                },
+                function (ignoredByUsers, next) {
+                    if (ignoredByUsers && ignoredByUsers.length && ignoredByUsers[0]!=null) {
+                        ignoredByUsers.forEach(function (uid) {
+                        var markAsReadUids = [];
+                        async.waterfall([
+                            function (next){
+                                Topics.getUnreadTids(0, uid, null, next);
+                            },
+                            function(tids,next){
+                                    if(tids && tids.indexOf(data.tid) === -1){
+                                        markAsReadUids.push(uid);
+                                        data.markAsReadUids = markAsReadUids;
+                                    }                   
+                                }
+                            ]
+                        );
                     });
-                });
-            }else{
-                data.markAsReadUids = [];
-            }
-            callback(null, data);
-        })
+                    }else{
+                        data.markAsReadUids = [];
+                    }
+                }
+            ],
+            callback(null,data)
+         );
     };
 
     /**
