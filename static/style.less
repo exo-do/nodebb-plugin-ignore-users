@@ -12,6 +12,9 @@ li.ignored>.box{
 li.ignored>.box>.post-details {
     display: none;
 }
+li.ignored>.links-bar {
+    display: none;
+}
 
 li.ignored>.box>.right-content>.content {
     min-height: 50px;
@@ -21,10 +24,18 @@ li.ignored>.box>.right-content>.sub-content.post-footer{
 	display:none;
 }
 
+.btn.btn-sm.btn-success.unignoreForChat{
+    white-space: pre-line;
+}
+
 /**Rule for nodebb-theme-persona**/
 li.ignored>.content{
 	opacity: 0.3;
 	transition: opacity 1s ease 0.5s;
+}
+
+li.ignored>.post-footer>{
+	display:none;
 }
 
 .post-row:not(.ignored) a.ignore {
