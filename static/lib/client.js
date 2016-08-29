@@ -19,10 +19,15 @@
         /* We are in the profile */
         if (data.tpl=='account/profile') {
             //If the user is visualizing its own profile then the link should have another text and the link reference should point to the list of ignored users.
+            if(config['theme:id']==='nodebb-theme-lavender'){$('.cover').hide();}
             if(parseInt(ajaxify.data.yourid,10)===parseInt(ajaxify.data.theirid,10)){
                 require(['translator'], function(translator) {
                      translator.translate('[[ignored:ignored_list]]', function(translated) {
-                        $('.dropdown-menu.dropdown-menu-right').append('<li><a class="ignored-list" href="/'+data.url+'/ignored" ><i class=" fa fa-eye-slash"></i> '+translated+'</a></li>');
+                        if(config['theme:id']!=='nodebb-theme-lavender'){
+                            $('.dropdown-menu.dropdown-menu-right').append('<li><a class="ignored-list" href="/'+data.url+'/ignored" ><i class=" fa fa-eye-slash"></i> '+translated+'</a></li>');
+                        }else{
+                            $('.dropdown-menu.pull-right').append('<li><a class="ignored-list" href="/'+data.url+'/ignored" ><i class=" fa fa-eye-slash"></i> '+translated+'</a></li>');
+                        }
                     });
                 });
 
@@ -37,11 +42,19 @@
 
                 require(['translator'], function(translator) {
                      translator.translate(translationText, function(translated) {
-                        $('.dropdown-menu.dropdown-menu-right').append('<li><a class="ignore-user" href="#" ><i class="'+icon+'"></i> <span class="ignore-user-text">'+translated+'</span></a></li>');
+                        if(config['theme:id']!=='nodebb-theme-lavender'){
+                            $('.dropdown-menu.dropdown-menu-right').append('<li><a class="ignore-user" href="#" ><i class="'+icon+'"></i> <span class="ignore-user-text">'+translated+'</span></a></li>');
+                        }else{
+                            $('.dropdown-menu.pull-right').append('<li><a class="ignore-user" href="#" ><i class="'+icon+'"></i> <span class="ignore-user-text">'+translated+'</span></a></li>');
+                        }
                     });
 
                      translator.translate(chatTranslationText, function(translated) {
-                        $('.dropdown-menu.dropdown-menu-right').append('<li><a class="ignore-user-chat" href="#" ><i class="'+chatIcon+'"></i> <span class="ignore-user-chat-text">'+translated+'</span></a></li>');
+                         if(config['theme:id']!=='nodebb-theme-lavender'){
+                            $('.dropdown-menu.dropdown-menu-right').append('<li><a class="ignore-user-chat" href="#" ><i class="'+chatIcon+'"></i> <span class="ignore-user-chat-text">'+translated+'</span></a></li>');
+                         }else{
+                             $('.dropdown-menu.pull-right').append('<li><a class="ignore-user-chat" href="#" ><i class="'+chatIcon+'"></i> <span class="ignore-user-chat-text">'+translated+'</span></a></li>');
+                         }
                     });
                 });
 
@@ -65,7 +78,11 @@
                     }
                     //We add the element on the page, in the place we want
                     $('li[component="post"][data-pid="'+post.pid+'"]').find('a[itemprop="author"]').after('<a href="#" itemprop="ignorespot" data-uid="'+post.uid+'" class="fa '+icon+' '+className+'"></a>');
-                    $('li[component="post"][data-pid="'+post.pid+'"] div.content').after('<div class="original-content hide" component="post/original-content" itemprop="text">'+post.originalContent+'</div>');
+                    if(config['theme:id']!=='nodebb-theme-lavender'){
+                        $('li[component="post"][data-pid="'+post.pid+'"] div.content').after('<div class="original-content hide" component="post/original-content" itemprop="text">'+post.originalContent+'</div>');
+                    }else{
+                        $('li[component="post"][data-pid="'+post.pid+'"] div.post-content').after('<div class="original-content hide" component="post/original-content" itemprop="text">'+post.originalContent+'</div>');
+                    }
                     if(postClass!=null){
                         $('li[component="post"][data-pid="'+post.pid+'"]').addClass('ignored');
                     }
@@ -74,6 +91,10 @@
         }else if(data.tpl=='account/ignored'){
             //Add ignored user list listeners.
             addIgnoredListHandlers();
+            if(config['theme:id']==='nodebb-theme-lavender'){
+                $('.cover').hide();
+            }
+            
         }
     });
 
@@ -81,7 +102,12 @@
         $('.posts').on('click', 'a.ignore, a.unignore', function () {
 
             //Execute the (un)ignore function
-            var autor = $(this).parent().find('a[itemprop="author"]');
+            var autor = null;
+            if(config['theme:id']!=='nodebb-theme-lavender'){
+                autor = $(this).parent().find('a[itemprop="author"]');
+            }else{
+                autor = $(this).parent().parent();
+            }
 
             toggleIgnoreUser({
                 id: autor.attr('data-uid'),
@@ -217,14 +243,23 @@
 
                 require(['translator'], function(translator) {
                     translator.translate('[[ignored:ignored_post]]', function(translated) {
-                        post.find('.content').html(translated);
-                        post.addClass('ignored');
+                        if(config['theme:id']!=='nodebb-theme-lavender'){
+                            post.find('.content').html(translated);
+                            post.addClass('ignored');
+                        }else{
+                            post.find('.post-content').html(translated);
+                            post.addClass('ignored');
+                        }
                 });
         });
 
             } else {
                 //The original content is shown
-                post.find('.content').html(post.find('.original-content').html());
+                if(config['theme:id']!=='nodebb-theme-lavender'){
+                    post.find('.content').html(post.find('.original-content').html());
+                }else{
+                    post.find('.post-content').html(post.find('.original-content').html());
+                }
                 post.removeClass('ignored');
                 //Trigger the image processing in the viewport.
                 require(['forum/topic/posts'], function(posts) {
