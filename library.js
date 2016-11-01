@@ -12,6 +12,9 @@
         nconf = module.parent.require('nconf'),
         templates = module.parent.require('templates.js'),
         Topics = module.parent.require('./topics'),
+        Posts = module.parent.require('./posts'),
+        accountHelpers = module.parent.require('./controllers/accounts/helpers'),
+        privileges = module.parent.require('./privileges'),
         translator = require.main.require('./public/src/modules/translator');
 
     /**
@@ -21,29 +24,41 @@
         try {
             async.eachSeries(data.posts,
             function(p, cb){
+                async.waterfall([
+                    function (next){
+                        privileges.posts.get([p.pid], data.uid, next);
+                    }
+                ],function(err,privi){
+
                 if (data && p && data.uid && data.uid !== p.uid) {
                     User.isIgnored(data.uid, p.uid, function (err, ignored) {
                         if (err) {
                             console.error("Error checking if the user has been ignored " + p.uid, e);
                             cb();
                         }
-
-                        p.originalContent = p.content;
-                        p.ignored = ignored;
-                        if(ignored){
-                            translator.translate('[[ignored:ignored_post]]', function(translated) {
-                                p.content = translated;
+                        translator.translate('[[topic:post_is_deleted]]',function(translated){
+		                    if (p.deleted && !(privi[0].isAdminOrMod || p.selfPost)) {
+			                    p.content = translated;
+                                p.originalContent = p.content;
+		                    }else{
+                                p.originalContent = p.content;
+                            }
+                            p.ignored = ignored;
+                            if(ignored){
+                                translator.translate('[[ignored:ignored_post]]', function(translated) {
+                                    p.content = translated;
+                                    cb();
+                                });
+                            }else{
                                 cb();
-                            });
-                        }else{
-                            cb();
-                        }
-                        
-
+                            }
+                        });
                     });
                 } else {
                     cb();
                 }
+                }
+                )
             }, function(r){
                 callback(null, data);
             });
@@ -64,14 +79,16 @@
             if (!req.user) {
                 return helpers.notAllowed(req, res);
             }
-
+            var returnUser = null;
             async.waterfall([
 
                 function (next) {
-                    User.getUidByUserslug(req.params.userslug, next);
+                    accountHelpers.getUserDataByUserSlug(req.params.userslug, req.uid, next);
+                    //User.getUidByUserslug(req.params.userslug, next);
                 },
-                function (uid, next) {
-                    if (req.user.uid !== uid) {
+                function (user, next) {
+                    returnUser = user;
+                    if (req.user.uid !== user.uid) {
                         return helpers.notAllowed(req, res);
                     }
                     User.getIgnoredUsers(req.user.uid, next);
@@ -89,27 +106,33 @@
                    },
                    User.getUsersData
                    ],function (err,usersChat) {
+
                 if (err) {
                     console.err(err);
                     return helpers.notFound(req, res);
                 }
-                    res.render('account/ignored', {
-                        showSettings: true,
-                        showHidden: true,
-                        isSelf: true,
-                        userslug: req.params.userslug,
-                        ignored: users,
-                        ignoredForChat:usersChat,
-                        ignoredCount: users.length,
-                        ignoreChatCount: usersChat.length
-                    });
+
+                    returnUser.showSettings= true;
+                    returnUser.showHidden= true;
+                    returnUser.isSelf= true;
+                    returnUser.userslug= req.params.userslug;
+                    returnUser.ignored= users;
+                    returnUser.ignoredForChat=usersChat;
+                    returnUser.ignoredCount= users.length;
+                    returnUser.ignoreChatCount= usersChat.length;
+                    returnUser.breadcrumbs= [
+                        {text:"[[global:home]]",url:"/"},
+                        {text:req.params.userslug,url:"/user/"+req.params.userslug},
+                        {text:"[[ignored:ignored]]",url:"/user/"+req.params.userslug+"ignored"}];
+
+                    res.render('account/ignored', returnUser);
                 });
             });
 
         }
 
         app.get('/user/:userslug/ignored', params.middleware.buildHeader, controllers.accounts.getIgnored);
-        app.get('/api/user/:userslug/ignored', controllers.accounts.getIgnored);
+        app.get('/api/user/:userslug/ignored',controllers.accounts.getIgnored);
 
         templates.setGlobal('ignorePluginEnabled', true);
 
@@ -374,6 +397,25 @@
                 Topics.markAsRead(tids, uid);
             });
         }
+    }
+
+    /**
+     * Removes the data existing on originalContent attribute in order to be coherent with the post deletion
+     * (if not removed, the post would be vissible if it was ignored previously if an user decides to unignore)
+     * 
+     * action:post.delete
+     */
+    plugin.eraseOriginalContentOnPostDeletion = function name(pid){
+        Posts.setPostFields(pid, {originalContent: null},function(){});
+    }
+
+    /**
+     * Restores the attribute originalContent.
+     * 
+     * action:post.restore
+     */
+    plugin.includeOriginalContentOnPostDeletion = function name(data){
+        Posts.setPostFields(data.pid, {originalContent: data.content},function(){});
     }
 
     module.exports = plugin;

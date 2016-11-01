@@ -1,4 +1,8 @@
-<!-- IMPORT partials/account_menu.tpl -->
+
+<div class="account">
+  <!-- IMPORT partials/account/header.tpl -->
+  <!-- IMPORT partials/account_menu.tpl -->
+</div>
 <div class="users ignored-users">
    <div class="panel panel-default">
       <div class="panel-heading">
