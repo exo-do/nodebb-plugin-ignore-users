@@ -6,7 +6,8 @@
 	"library": "./library.js",
 	"hooks": [
 		{
-			"hook": "filter:post.getPosts", "method": "parse", "callbacked": true
+			"hook": "filter:post.getPosts",
+			"method": "parse", "callbacked": true
 		},
 		{
 			"hook": "static:app.load",
@@ -41,12 +42,20 @@
 			"method": "unreadManagement"
 		},
 		{
-			"hook": "filter:post.save",
+			"hook": "filter:post.create",
 			"method": "unreadOmmitment"
 		},
 		{
 			"hook": "action:post.save",
 			"method": "markAsReadIfNeccesary"
+		},
+		{
+		"hook":"action:post.delete",
+		"method":"eraseOriginalContentOnPostDeletion"
+		},
+		{
+		"hook":"action:post.restore",
+		"method":"includeOriginalContentOnPostDeletion"
 		}
 	],
 	"scripts": ["static/lib/client.js"],

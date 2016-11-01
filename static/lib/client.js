@@ -18,7 +18,47 @@
     $(window).on('action:ajaxify.contentLoaded', function (event, data) {
         /* We are in the profile */
         if (data.tpl=='account/profile') {
-            //If the user is visualizing its own profile then the link should have another text and the link reference should point to the list of ignored users.
+            extendMenuItems(data);
+            addProfileHandlers();
+        }else if(data.tpl=='topic'){
+            //We are in the topic page.
+            var icon, className, postClass = null;
+            //we have to check each topic
+            ajaxify.data.posts.forEach(function (post){
+                postClass = null;
+                if(post.uid!=app.user.uid){
+                    if(post.ignored){
+                        icon = 'fa-eye';
+                        className = 'unignore';
+                        postClass = 'ignored';
+                    }else{
+                        icon = 'fa-eye-slash';
+                        className = 'ignore';
+                    }
+                    //We add the element on the page, in the place we want
+                    $('li[component="post"][data-pid="'+post.pid+'"]').find('a[itemprop="author"]').after('<a href="#" itemprop="ignorespot" data-uid="'+post.uid+'" class="fa '+icon+' '+className+'"></a>');
+                    if(config['theme:id']!=='nodebb-theme-lavender'){
+                        $('li[component="post"][data-pid="'+post.pid+'"] div.content').after('<div class="original-content hide" component="post/original-content" itemprop="text">'+post.originalContent+'</div>');
+                    }else{
+                        $('li[component="post"][data-pid="'+post.pid+'"] div.post-content').after('<div class="original-content hide" component="post/original-content" itemprop="text">'+post.originalContent+'</div>');
+                    }
+                    if(postClass!=null){
+                        $('li[component="post"][data-pid="'+post.pid+'"]').addClass('ignored');
+                    }
+                }
+          });
+        }else if(data.tpl=='account/ignored'){
+            extendMenuItems(data);
+            //Add ignored user list listeners.
+            addIgnoredListHandlers();
+            if(config['theme:id']==='nodebb-theme-lavender'){
+                $('.cover').hide();
+            }
+        }
+    });
+
+    function extendMenuItems(data){
+                    //If the user is visualizing its own profile then the link should have another text and the link reference should point to the list of ignored users.
             if(config['theme:id']==='nodebb-theme-lavender'){$('.cover').hide();}
             if(parseInt(ajaxify.data.yourid,10)===parseInt(ajaxify.data.theirid,10)){
                 require(['translator'], function(translator) {
@@ -59,44 +99,7 @@
                 });
 
             }
-
-            addProfileHandlers();
-        }else if(data.tpl=='topic'){
-            //We are in the topic page.
-            var icon, className, postClass = null;
-            //we have to check each topic
-            ajaxify.data.posts.forEach(function (post){
-                postClass = null;
-                if(post.uid!=app.user.uid){
-                    if(post.ignored){
-                        icon = 'fa-eye';
-                        className = 'unignore';
-                        postClass = 'ignored';
-                    }else{
-                        icon = 'fa-eye-slash';
-                        className = 'ignore';
-                    }
-                    //We add the element on the page, in the place we want
-                    $('li[component="post"][data-pid="'+post.pid+'"]').find('a[itemprop="author"]').after('<a href="#" itemprop="ignorespot" data-uid="'+post.uid+'" class="fa '+icon+' '+className+'"></a>');
-                    if(config['theme:id']!=='nodebb-theme-lavender'){
-                        $('li[component="post"][data-pid="'+post.pid+'"] div.content').after('<div class="original-content hide" component="post/original-content" itemprop="text">'+post.originalContent+'</div>');
-                    }else{
-                        $('li[component="post"][data-pid="'+post.pid+'"] div.post-content').after('<div class="original-content hide" component="post/original-content" itemprop="text">'+post.originalContent+'</div>');
-                    }
-                    if(postClass!=null){
-                        $('li[component="post"][data-pid="'+post.pid+'"]').addClass('ignored');
-                    }
-                }
-          });
-        }else if(data.tpl=='account/ignored'){
-            //Add ignored user list listeners.
-            addIgnoredListHandlers();
-            if(config['theme:id']==='nodebb-theme-lavender'){
-                $('.cover').hide();
-            }
-            
-        }
-    });
+    }
 
     function addTopicHandlers() {
         $('.posts').on('click', 'a.ignore, a.unignore', function () {
@@ -326,7 +329,7 @@
         require(['translator'], function(translator) {
         translator.translate(textToTranslate, function(translated) {
                 $('li.users-box.registered-user.ignored-for-posts[data-uid="'+user.id+'"]').remove();
-                if($('li.users-box.registered-user.ignored-for-posts').size()==0){
+                if($('li.users-box.registered-user.ignored-for-posts').length==0){
                     //We show the message of empty ignored list according to the tpl.
                     require(['translator'], function(translator) {
                         translator.translate('[[ignored:ignored_no_one]]', function(translated) {
@@ -351,7 +354,7 @@
         require(['translator'], function(translator) {
         translator.translate(textToTranslate, function(translated) {
                 $('li.users-box.registered-user.ignoreForChat[data-uid="'+user.id+'"]').remove();
-                if($('li.users-box.registered-user.ignoreForChat').size()==0){
+                if($('li.users-box.registered-user.ignoreForChat').length==0){
                     //We show the message of empty ignored list according to the tpl.
                     require(['translator'], function(translator) {
                         translator.translate('[[ignored:chat.ignored_no_one]]', function(translated) {
