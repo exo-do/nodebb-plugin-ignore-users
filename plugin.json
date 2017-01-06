@@ -50,12 +50,12 @@
 			"method": "markAsReadIfNeccesary"
 		},
 		{
-		"hook":"action:post.delete",
-		"method":"eraseOriginalContentOnPostDeletion"
+			"hook":"action:post.delete",
+			"method":"eraseOriginalContentOnPostDeletion"
 		},
 		{
-		"hook":"action:post.restore",
-		"method":"includeOriginalContentOnPostDeletion"
+			"hook":"action:post.restore",
+			"method":"includeOriginalContentOnPostDeletion"
 		}
 	],
 	"scripts": ["static/lib/client.js"],
