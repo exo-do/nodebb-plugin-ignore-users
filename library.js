@@ -307,18 +307,18 @@
      */
     plugin.notificationManagement = function name(params,callback) {
         var filteredUids = [];
-        if(params.notification!=null){
+        if(params.notification!=null /*params.notification.mergeId.indexOf('notifications:upvoted_your_post_in')>-1*/){
             User.getIgnoredByUsers(params.notification.from, function (err, ignoredByUsers) {
                 if (ignoredByUsers && ignoredByUsers.length) {
                     params.uids.forEach(function (uid) {
-                        if(ignoredByUsers.indexOf(uid) == -1){
+                        if(ignoredByUsers.indexOf(uid.toString()) == -1){
                             filteredUids.push(uid);
                         }
                     });
                     params.uids = filteredUids;
                 }
                 callback(null, params);
-            })
+            });
         }else{
             callback(null, params);
         }
