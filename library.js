@@ -37,7 +37,7 @@
                             cb();
                         }
                         translator.translate('[[topic:post_is_deleted]]',function(translated){
-		                    if (p.deleted && !(privi[0].isAdminOrMod || p.selfPost)) {
+		                    if (p.deleted===1 && !(privi[0].isAdminOrMod || p.selfPost)) {
 			                    p.content = translated;
                                 p.originalContent = p.content;
 		                    }else{
