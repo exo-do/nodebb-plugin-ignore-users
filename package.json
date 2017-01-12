@@ -25,7 +25,8 @@
   },
   "readmeFilename": "README.md",
   "scripts": {
-    "2npm": "publish"
+    "2npm": "publish",
+    "async": "~1.5.0"
   },
   "devDependencies": {
     "publish": "0.5.0"

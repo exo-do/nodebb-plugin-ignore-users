@@ -7,7 +7,6 @@
         User = module.parent.require('./user'),
         db = module.parent.require('./database'),
         plugins = module.parent.require('./plugins'),
-        async = module.parent.require('async'),
         helpers = module.parent.require('./controllers/helpers'),
         nconf = module.parent.require('nconf'),
         templates = module.parent.require('templates.js'),
@@ -15,7 +14,8 @@
         Posts = module.parent.require('./posts'),
         accountHelpers = module.parent.require('./controllers/accounts/helpers'),
         privileges = module.parent.require('./privileges'),
-        translator = require.main.require('./public/src/modules/translator');
+        translator = require.main.require('./public/src/modules/translator'),
+        async = require('async');
 
     /**
      * Check if the post belongs to an ignored user
@@ -88,10 +88,10 @@
                 },
                 function (user, next) {
                     returnUser = user;
-                    if (req.user.uid !== user.uid) {
+                    if ((parseInt(req.user.uid, 10) !== parseInt(user.uid, 10)) && !user.isAdminOrGlobalModerator) {
                         return helpers.notAllowed(req, res);
                     }
-                    User.getIgnoredUsers(req.user.uid, next);
+                    User.getIgnoredUsers(returnUser.uid, next);
                 },
                 User.getUsersData
             ], function (err, users,usersChat) {
@@ -102,7 +102,7 @@
                 }
                async.waterfall([
                    function(next,users){
-                       User.getIgnoredUsersForChat(req.user.uid, next);
+                       User.getIgnoredUsersForChat(returnUser.uid, next);
                    },
                    User.getUsersData
                    ],function (err,usersChat) {
@@ -112,6 +112,7 @@
                     return helpers.notFound(req, res);
                 }
 
+                    returnUser.title = '[[ignored:ignored]]';
                     returnUser.showSettings= true;
                     returnUser.showHidden= true;
                     returnUser.isSelf= true;
@@ -203,24 +204,44 @@
             ignored: true
         });
 
-        //Users that the actual user is ignoring.
-        db.setAdd('ignored:' + socket.uid, data.ignoreduid, callback);
-        //Sets of users ignoring a certain user.
-        db.setAdd('ignored:by:' + data.ignoreduid, socket.uid, callback);
+        async.series([
+            //Users that the actual user is ignoring.
+            async.apply(db.setAdd, 'ignored:' + socket.uid, data.ignoreduid),
+            //Sets of users ignoring a certain user.
+            async.apply(db.setAdd, 'ignored:by:' + data.ignoreduid, socket.uid)
+        ], callback);
     };
 
     /**
      * It removes an user from the ignore list
      */
     Socket.unignoreUser = function (socket, data, callback) {
-        plugins.fireHook('action:plugin.ignore-users.toggled', {
-            uid: socket.uid,
-            ignoreduid: data.ignoreduid,
-            ignored: false
-        });
+        async.parallel({
+            isAdministrator: function (next) {
+                User.isAdministrator(socket.uid, next);
+            },
+            isGlobalModerator: function (next) {
+                User.isGlobalModerator(socket.uid, next);
+            }
+        }, function (err, callingUser) {
+            plugins.fireHook('action:plugin.ignore-users.toggled', {
+                uid: socket.uid,
+                ignoreduid: data.ignoreduid,
+                targetuid: data.targetuid,
+                ignored: false
+            });
 
-        db.setRemove('ignored:' + socket.uid, data.ignoreduid, callback);
-        db.setRemove('ignored:by:' + data.ignoreduid,socket.uid , callback);
+            var uid = data.targetuid || socket.uid;
+
+            if (parseInt(uid, 10) !== parseInt(socket.uid, 10) && !(callingUser.isAdministrator || callingUser.isGlobalModerator)) {
+                return callback(new Error('[[error:invalid-data]]'));
+            }
+
+            async.series([
+                async.apply(db.setRemove, 'ignored:' + uid, data.ignoreduid),
+                async.apply(db.setRemove, 'ignored:by:' + data.ignoreduid, uid)
+            ], callback);
+        });
     };
 
     /**
@@ -254,13 +275,29 @@
      * It removes an user from the chat ignore list
      */
     Socket.unignoreUserForChat = function (socket, data, callback) {
-        plugins.fireHook('action:plugin.ignore-users.chat.toggled', {
-            uid: socket.uid,
-            ignoreduid: data.ignoreduid,
-            ignored: false
-        });
+        async.parallel({
+            isAdministrator: function (next) {
+                User.isAdministrator(socket.uid, next);
+            },
+            isGlobalModerator: function (next) {
+                User.isGlobalModerator(socket.uid, next);
+            }
+        }, function (err, callingUser) {
+            plugins.fireHook('action:plugin.ignore-users.chat.toggled', {
+                uid: socket.uid,
+                ignoreduid: data.ignoreduid,
+                targetuid: data.targetuid,
+                ignored: false
+            });
 
-        db.setRemove('ignored:chat:' + socket.uid, data.ignoreduid, callback);
+            var uid = data.targetuid || socket.uid;
+
+            if (parseInt(uid, 10) !== parseInt(socket.uid, 10) && !(callingUser.isAdministrator || callingUser.isGlobalModerator)) {
+                return callback(new Error('[[error:invalid-data]]'));
+            }
+
+            db.setRemove('ignored:chat:' + uid, data.ignoreduid, callback);
+        });
     };
 
     /**
