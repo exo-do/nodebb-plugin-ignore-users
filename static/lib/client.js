@@ -152,7 +152,8 @@
             toggleIgnoreUser({
                 id: $(this).parent().parent().attr('data-uid'),
                 name: $(this).parent().find('a').html(),
-                ignored: true
+                ignored: true,
+                targetid: ajaxify.data.uid
             }, toggleIgnoreList);
 
             return false;
@@ -163,7 +164,8 @@
             toggleIgnoreUserForChat({
                 id: $(this).parent().parent().attr('data-uid'),
                 name: $(this).parent().find('a').html(),
-                ignored: true
+                ignored: true,
+                targetid: ajaxify.data.uid
             }, toggleIgnoreListForChat);
 
             return false;
@@ -175,7 +177,8 @@
      */
     function toggleIgnoreUser(user, callback) {
         socket.emit(user.ignored ? 'modules.unignoreUser' : 'modules.ignoreUser', {
-            ignoreduid: user.id
+            ignoreduid: user.id,
+            targetuid: user.targetid
         }, function (err, res) {
 
             if (err) {
@@ -204,7 +207,8 @@
      */
     function toggleIgnoreUserForChat(user, callback) {
         socket.emit(user.ignored ? 'modules.unignoreUserForChat' : 'modules.ignoreUserForChat', {
-            ignoreduid: user.id
+            ignoreduid: user.id,
+            targetuid: user.targetid
         }, function (err, res) {
 
             if (err) {
