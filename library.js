@@ -7,7 +7,6 @@
         User = module.parent.require('./user'),
         db = module.parent.require('./database'),
         plugins = module.parent.require('./plugins'),
-        async = module.parent.require('async'),
         helpers = module.parent.require('./controllers/helpers'),
         nconf = module.parent.require('nconf'),
         templates = module.parent.require('templates.js'),
@@ -15,7 +14,8 @@
         Posts = module.parent.require('./posts'),
         accountHelpers = module.parent.require('./controllers/accounts/helpers'),
         privileges = module.parent.require('./privileges'),
-        translator = require.main.require('./public/src/modules/translator');
+        translator = require.main.require('./public/src/modules/translator'),
+        async = require('async');
 
     /**
      * Check if the post belongs to an ignored user
@@ -203,10 +203,12 @@
             ignored: true
         });
 
-        //Users that the actual user is ignoring.
-        db.setAdd('ignored:' + socket.uid, data.ignoreduid, callback);
-        //Sets of users ignoring a certain user.
-        db.setAdd('ignored:by:' + data.ignoreduid, socket.uid, callback);
+        async.series([
+            //Users that the actual user is ignoring.
+            async.apply(db.setAdd, 'ignored:' + socket.uid, data.ignoreduid),
+            //Sets of users ignoring a certain user.
+            async.apply(db.setAdd, 'ignored:by:' + data.ignoreduid, socket.uid)
+        ], callback);
     };
 
     /**
@@ -219,8 +221,10 @@
             ignored: false
         });
 
-        db.setRemove('ignored:' + socket.uid, data.ignoreduid, callback);
-        db.setRemove('ignored:by:' + data.ignoreduid,socket.uid , callback);
+        async.series([
+            async.apply(db.setRemove, 'ignored:' + socket.uid, data.ignoreduid),
+            async.apply(db.setRemove, 'ignored:by:' + data.ignoreduid,socket.uid)
+        ], callback);
     };
 
     /**
