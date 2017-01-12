@@ -112,6 +112,7 @@
                     return helpers.notFound(req, res);
                 }
 
+                    returnUser.title = '[[ignored:ignored]]';
                     returnUser.showSettings= true;
                     returnUser.showHidden= true;
                     returnUser.isSelf= true;
