@@ -16,11 +16,19 @@
     }
 
     $(window).on('action:ajaxify.contentLoaded', function (event, data) {
+        if (!app.user.uid) {
+            return;
+        }
+        
         /* We are in the profile */
         if (data.tpl=='account/profile') {
             extendMenuItems(data);
             addProfileHandlers();
         }else if(data.tpl=='topic'){
+            if (!app.user.uid) {
+                return;
+            }
+
             //We are in the topic page.
             var icon, className, postClass = null;
             //we have to check each topic
