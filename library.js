@@ -88,7 +88,7 @@
                 },
                 function (user, next) {
                     returnUser = user;
-                    if (req.user.uid !== user.uid) {
+                    if (parseInt(req.user.uid, 10) !== parseInt(user.uid, 10)) {
                         return helpers.notAllowed(req, res);
                     }
                     User.getIgnoredUsers(req.user.uid, next);
