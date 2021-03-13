@@ -3,17 +3,17 @@
 
     var plugin = {};
 
-    var Socket = module.parent.require('./socket.io/modules'),
-        User = module.parent.require('./user'),
-        db = module.parent.require('./database'),
-        plugins = module.parent.require('./plugins'),
-        helpers = module.parent.require('./controllers/helpers'),
-        nconf = module.parent.require('nconf'),
-        templates = module.parent.require('templates.js'),
-        Topics = module.parent.require('./topics'),
-        Posts = module.parent.require('./posts'),
-        accountHelpers = module.parent.require('./controllers/accounts/helpers'),
-        privileges = module.parent.require('./privileges'),
+    var Socket = require.main.require('./src/socket.io/modules'),
+        User = require.main.require('./src/user'),
+        db = require.main.require('./src/database'),
+        plugins = require.main.require('./src/plugins'),
+        helpers = require.main.require('./src/controllers/helpers'),
+        nconf = require.main.require('nconf'),
+        templates = require.main.require('templates.js'),
+        Topics = require.main.require('./src/topics'),
+        Posts = require.main.require('./src/posts'),
+        accountHelpers = require.main.require('./src/controllers/accounts/helpers'),
+        privileges = require.main.require('./src/privileges'),
         translator = require.main.require('./public/src/modules/translator'),
         async = require('async');
 
